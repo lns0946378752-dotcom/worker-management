@@ -1,0 +1,42 @@
+[
+  {
+    "id": "worker-001",
+    "name": "Nguyễn Văn A",
+    "role": "Machine operator",
+    "status": "active",
+    "shift": "A-Shift",
+    "department": "Production"
+  },
+  {
+    "id": "worker-002",
+    "name": "Trần Thị B",
+    "role": "QC Inspector",
+    "status": "idle",
+    "shift": "B-Shift",
+    "department": "Quality"
+  },
+  {
+    "id": "worker-003",
+    "name": "Lê Văn C",
+    "role": "Warehouse",
+    "status": "on-leave",
+    "shift": "A-Shift",
+    "department": "Logistics"
+  },
+  {
+    "id": "worker-004",
+    "name": "Phạm Thị D",
+    "role": "Team Lead",
+    "status": "active",
+    "shift": "C-Shift",
+    "department": "Production"
+  },
+  {
+    "id": "worker-1789464817890",
+    "name": "LNS",
+    "role": "demo",
+    "status": "idle",
+    "shift": "A",
+    "department": "Logistics"
+  }
+]
