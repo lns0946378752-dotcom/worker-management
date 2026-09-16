@@ -1,5 +1,5 @@
 import type { UploadRecord, UserRecord, WorkerRecord } from "@/lib/types";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { requireSupabaseServerClient } from "@/lib/supabase/server";
 
 // Note: removed seeded default workers to avoid showing fake data in UI.
 
@@ -31,25 +31,17 @@ function mapWorkerToRecord(row: Record<string, unknown>): WorkerRecord {
 }
 
 export async function readUsers() {
-  const client = getSupabaseServerClient();
-
-  if (client) {
-    const { data, error } = await client.from("profiles").select("*");
-    if (!error && data) {
-      return data.map((row) => mapProfileToUser(row));
-    }
+  const client = requireSupabaseServerClient();
+  const { data, error } = await client.from("profiles").select("*");
+  if (error) {
+    throw new Error(`Could not read profiles: ${error.message}`);
   }
 
-  // No DB client or no profiles — return empty list (do not expose hard-coded users)
-  return [] as UserRecord[];
+  return (data ?? []).map((row) => mapProfileToUser(row));
 }
 
 export async function writeUsers(users: UserRecord[]) {
-  const client = getSupabaseServerClient();
-  if (!client) {
-    return users;
-  }
-
+  const client = requireSupabaseServerClient();
   const { error } = await client.from("profiles").upsert(
     users.map((user) => ({
       id: user.id,
@@ -63,32 +55,24 @@ export async function writeUsers(users: UserRecord[]) {
   );
 
   if (error) {
-    console.error("writeUsers failed:", error.message);
+    throw new Error(`Could not write profiles: ${error.message}`);
   }
 
   return users;
 }
 
 export async function readWorkers() {
-  const client = getSupabaseServerClient();
-
-  if (client) {
-    const { data, error } = await client.from("workers").select("*");
-    if (!error && data) {
-      return data.map((row) => mapWorkerToRecord(row));
-    }
+  const client = requireSupabaseServerClient();
+  const { data, error } = await client.from("workers").select("*").order("created_at", { ascending: false });
+  if (error) {
+    throw new Error(`Could not read workers: ${error.message}`);
   }
 
-  // If no DB client or no data, return empty array — do NOT return seeded data.
-  return [] as WorkerRecord[];
+  return (data ?? []).map((row) => mapWorkerToRecord(row));
 }
 
 export async function writeWorkers(workers: WorkerRecord[]) {
-  const client = getSupabaseServerClient();
-  if (!client) {
-    return workers;
-  }
-
+  const client = requireSupabaseServerClient();
   const { error } = await client.from("workers").upsert(
     workers.map((worker) => ({
       id: worker.id,
@@ -103,22 +87,41 @@ export async function writeWorkers(workers: WorkerRecord[]) {
   );
 
   if (error) {
-    console.error("writeWorkers failed:", error.message);
+    throw new Error(`Could not write workers: ${error.message}`);
   }
 
   return workers;
 }
 
-export async function readUploads() {
-  const client = getSupabaseServerClient();
-  if (!client) {
-    return [] as UploadRecord[];
+export async function createWorker(worker: Omit<WorkerRecord, "id">) {
+  const client = requireSupabaseServerClient();
+  const { data, error } = await client
+    .from("workers")
+    .insert({
+      name: worker.name,
+      role: worker.role,
+      status: worker.status,
+      shift: worker.shift,
+      department: worker.department,
+      created_at: worker.createdAt,
+      avatar_url: worker.avatarUrl ?? null,
+    })
+    .select("*")
+    .single();
+
+  if (error || !data) {
+    throw new Error(`Could not create worker: ${error?.message ?? "No worker returned"}`);
   }
+
+  return mapWorkerToRecord(data);
+}
+
+export async function readUploads() {
+  const client = requireSupabaseServerClient();
 
   const { data, error } = await client.from("attachments").select("*");
   if (error) {
-    console.error("readUploads failed:", error.message);
-    return [] as UploadRecord[];
+    throw new Error(`Could not read uploads: ${error.message}`);
   }
 
   return (data ?? []).map((row) => ({
@@ -135,10 +138,7 @@ export async function readUploads() {
 }
 
 export async function writeUploads(uploads: UploadRecord[]) {
-  const client = getSupabaseServerClient();
-  if (!client) {
-    return uploads;
-  }
+  const client = requireSupabaseServerClient();
 
   const { error } = await client.from("attachments").upsert(
     uploads.map((upload) => ({
@@ -152,7 +152,7 @@ export async function writeUploads(uploads: UploadRecord[]) {
   );
 
   if (error) {
-    console.error("writeUploads failed:", error.message);
+    throw new Error(`Could not write uploads: ${error.message}`);
   }
 
   return uploads;

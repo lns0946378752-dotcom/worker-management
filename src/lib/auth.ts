@@ -3,7 +3,14 @@ import { randomBytes, scryptSync, timingSafeEqual } from "crypto";
 
 import type { UserRecord } from "@/lib/types";
 
-const JWT_SECRET = process.env.JWT_SECRET ?? "worker-management-dev-secret";
+function getJwtSecret() {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error("JWT_SECRET is not configured.");
+  }
+
+  return secret;
+}
 
 export type JwtPayload = {
   sub: string;
@@ -18,14 +25,14 @@ export function signUserToken(user: UserRecord) {
       email: user.email,
       role: user.role,
     },
-    JWT_SECRET,
+    getJwtSecret(),
     { expiresIn: "7d" }
   );
 }
 
 export function verifyUserToken(token: string) {
   try {
-    return jwt.verify(token, JWT_SECRET) as JwtPayload;
+    return jwt.verify(token, getJwtSecret()) as JwtPayload;
   } catch {
     return null;
   }

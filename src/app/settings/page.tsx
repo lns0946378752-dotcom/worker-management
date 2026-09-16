@@ -3,6 +3,7 @@
 import { useAppStore } from "@/store/useAppStore";
 import { Button, Card, Input } from "@/components/ui";
 import { useT } from "@/lib/i18n";
+import { RequireAuth } from "@/components/auth/RequireAuth";
 
 export default function SettingsPage() {
   const t = useT();
@@ -13,6 +14,7 @@ export default function SettingsPage() {
   const currentUser = useAppStore((s) => s.currentUser);
 
   return (
+    <RequireAuth>
     <main className="page-wrap">
       <Card title={t("settings") ?? "Settings"} className="full-span">
         <div style={{ display: 'grid', gap: 18 }}>
@@ -48,5 +50,6 @@ export default function SettingsPage() {
         </div>
       </Card>
     </main>
+    </RequireAuth>
   );
 }

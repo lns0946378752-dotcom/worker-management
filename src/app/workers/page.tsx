@@ -3,19 +3,14 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { RequireAuth } from "@/components/auth/RequireAuth";
 import { RoleGate } from "@/components/auth/RoleGate";
 import { Button, Card, Input, Modal, Table } from "@/components/ui";
 import { useAppStore } from "@/store/useAppStore";
 import { useT } from "@/lib/i18n";
+import type { WorkerRecord } from "@/lib/types";
 
-type Worker = {
-  id: string;
-  name: string;
-  role: string;
-  status: "active" | "idle" | "on-leave";
-  shift: string;
-  department: string;
-};
+type Worker = WorkerRecord;
 
 export default function WorkersPage() {
   const router = useRouter();
@@ -23,6 +18,7 @@ export default function WorkersPage() {
     router.push("/");
   };
   const currentUser = useAppStore((state) => state.currentUser);
+  const t = useT();
   const [workers, setWorkers] = useState<Worker[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -83,6 +79,7 @@ export default function WorkersPage() {
   };
 
   return (
+    <RequireAuth>
     <main className="page-wrap">
       <div style={{ marginBottom: 12 }}>
         <Button variant="secondary" size="sm" onClick={handleBack}>
@@ -148,5 +145,6 @@ export default function WorkersPage() {
         </div>
       </Modal>
     </main>
+    </RequireAuth>
   );
 }

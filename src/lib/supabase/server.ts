@@ -17,3 +17,11 @@ export const supabaseServerClient =
 export function getSupabaseServerClient() {
   return supabaseServerClient;
 }
+
+export function requireSupabaseServerClient() {
+  if (!supabaseServerClient) {
+    throw new Error("Supabase server configuration is missing.");
+  }
+
+  return supabaseServerClient;
+}

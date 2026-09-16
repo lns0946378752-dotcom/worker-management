@@ -28,14 +28,14 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password }),
       });
 
-      const payload = (await response.json()) as { user?: unknown; token?: string; message?: string };
+      const payload = (await response.json()) as { user?: unknown; message?: string };
 
-      if (!response.ok || !payload.user || !payload.token) {
+      if (!response.ok || !payload.user) {
         setError(payload.message ?? "Login failed.");
         return;
       }
 
-      login(payload.user as Parameters<typeof login>[0], payload.token);
+      login(payload.user as Parameters<typeof login>[0]);
       router.push("/");
     } catch {
       setError("Could not connect to the authentication service.");

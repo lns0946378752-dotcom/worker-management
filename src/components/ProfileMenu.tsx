@@ -11,10 +11,11 @@ export default function ProfileMenu() {
   const router = useRouter();
   const logout = useAppStore((s) => s.logout);
   const currentUser = useAppStore((s) => s.currentUser);
-  if (!currentUser) return null;
   const [open, setOpen] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const t = useT();
+
+  if (!currentUser) return null;
 
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });

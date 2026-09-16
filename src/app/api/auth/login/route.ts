@@ -31,7 +31,6 @@ export async function POST(request: Request) {
       department: user.department,
       avatarUrl: user.avatarUrl,
     },
-    token,
   });
 
   response.cookies.set("wm_token", token, {
