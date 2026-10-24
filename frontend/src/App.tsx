@@ -151,11 +151,38 @@ function App() {
 
   async function submitAuth(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setBusy(true);
     setError("");
+    const email = authForm.email.trim();
+    const passwordBytes = new TextEncoder().encode(authForm.password).length;
+    if (authMode === "register" && !authForm.fullName.trim()) {
+      setError("Vui lòng nhập họ và tên.");
+      return;
+    }
+    if (authMode === "register" && authForm.fullName.trim().length > 120) {
+      setError("Họ và tên không được vượt quá 120 ký tự.");
+      return;
+    }
+    if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError("Vui lòng nhập địa chỉ email hợp lệ.");
+      return;
+    }
+    if (authMode === "register" && authForm.password.length < 8) {
+      setError("Mật khẩu phải có ít nhất 8 ký tự.");
+      return;
+    }
+    if (!authForm.password || passwordBytes > 72) {
+      setError(passwordBytes > 72 ? "Mật khẩu không được vượt quá 72 byte." : "Vui lòng nhập mật khẩu.");
+      return;
+    }
+
+    setBusy(true);
     try {
       const endpoint = authMode === "login" ? "/auth/login" : "/auth/register";
-      const response = await api.post<{ user: Account; token: string }>(endpoint, authForm);
+      const response = await api.post<{ user: Account; token: string }>(endpoint, {
+        ...authForm,
+        fullName: authForm.fullName.trim(),
+        email,
+      });
       if (adminRoute && response.data.user.role !== "admin") {
         setAccessToken(null);
         setError("Tài khoản này không có quyền quản trị viên.");
@@ -360,9 +387,9 @@ function App() {
           </a>
           <h1>Đăng nhập quản trị</h1>
           <p>Trang dành riêng cho tài khoản Admin.</p>
-          <form className="admin-login-form" onSubmit={submitAuth}>
-            <label>Email<input aria-label="Email Admin" autoComplete="username" required type="email" placeholder="Email quản trị" value={authForm.email} onChange={(event) => setAuthForm({ ...authForm, email: event.target.value })} /></label>
-            <label>Mật khẩu<input aria-label="Mật khẩu Admin" autoComplete="current-password" required type="password" placeholder="Mật khẩu" value={authForm.password} onChange={(event) => setAuthForm({ ...authForm, password: event.target.value })} /></label>
+          <form className="admin-login-form" noValidate onSubmit={submitAuth}>
+            <label>Email<input aria-label="Email Admin" autoComplete="username" type="email" placeholder="Email quản trị" value={authForm.email} onChange={(event) => setAuthForm({ ...authForm, email: event.target.value })} /></label>
+            <label>Mật khẩu<input aria-label="Mật khẩu Admin" autoComplete="current-password" type="password" placeholder="Mật khẩu" value={authForm.password} onChange={(event) => setAuthForm({ ...authForm, password: event.target.value })} /></label>
             <button className="button button-primary" disabled={busy}>{busy ? "Đang đăng nhập..." : "Đăng nhập Admin"}</button>
           </form>
           <a className="text-button admin-back-link" href="/">← Quay lại trang tuyển dụng</a>
@@ -394,12 +421,12 @@ function App() {
               <button className="button button-quiet" onClick={signOut}>Đăng xuất</button>
             </>
           ) : (
-            <form className="auth-form" onSubmit={submitAuth}>
+            <form className="auth-form" noValidate onSubmit={submitAuth}>
               {authMode === "register" && (
                 <input
                   aria-label="Họ và tên"
                   placeholder="Họ và tên"
-                  required
+                  maxLength={120}
                   value={authForm.fullName}
                   onChange={(event) => setAuthForm({ ...authForm, fullName: event.target.value })}
                 />
@@ -407,8 +434,8 @@ function App() {
               <input
                 aria-label="Email"
                 autoComplete="email"
+                maxLength={254}
                 placeholder="Email"
-                required
                 type="email"
                 value={authForm.email}
                 onChange={(event) => setAuthForm({ ...authForm, email: event.target.value })}
@@ -416,9 +443,8 @@ function App() {
               <input
                 aria-label="Mật khẩu"
                 autoComplete={authMode === "login" ? "current-password" : "new-password"}
-                minLength={authMode === "register" ? 8 : 1}
+                maxLength={72}
                 placeholder="Mật khẩu"
-                required
                 type="password"
                 value={authForm.password}
                 onChange={(event) => setAuthForm({ ...authForm, password: event.target.value })}

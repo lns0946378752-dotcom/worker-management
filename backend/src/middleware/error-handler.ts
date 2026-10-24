@@ -15,20 +15,20 @@ export const errorHandler: ErrorRequestHandler = (error, _request, response, nex
   }
 
   if (error instanceof ZodError || error instanceof SequelizeValidationError) {
-    response.status(400).json({ message: "Request validation failed." });
+    response.status(400).json({ message: "Thông tin gửi lên chưa hợp lệ. Vui lòng kiểm tra lại." });
     return;
   }
 
   if (error instanceof UniqueConstraintError) {
-    response.status(409).json({ message: "A record with the same unique values already exists." });
+    response.status(409).json({ message: "Dữ liệu đã tồn tại hoặc bị trùng." });
     return;
   }
 
   if (error instanceof SyntaxError && "body" in error) {
-    response.status(400).json({ message: "Request body must contain valid JSON." });
+    response.status(400).json({ message: "Dữ liệu gửi lên không đúng định dạng." });
     return;
   }
 
   console.error("Unhandled API error:", error);
-  response.status(500).json({ message: "An unexpected server error occurred." });
+  response.status(500).json({ message: "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau." });
 };

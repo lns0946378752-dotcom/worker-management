@@ -28,7 +28,7 @@ app.use(
         return;
       }
 
-      callback(new HttpError(403, "Origin is not allowed by the CORS policy."));
+      callback(new HttpError(403, "Trang web chưa được cấp quyền kết nối tới máy chủ."));
     },
   })
 );
@@ -40,6 +40,7 @@ app.use(
     limit: 120,
     standardHeaders: "draft-8",
     legacyHeaders: false,
+    message: { message: "Bạn thao tác quá nhanh. Vui lòng chờ một lúc rồi thử lại." },
   })
 );
 
@@ -69,7 +70,7 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/vacancies", vacancyRoutes);
 app.use("/api/applications", applicationRoutes);
 
-app.use((_request, response) => response.status(404).json({ message: "Route was not found." }));
+app.use((_request, response) => response.status(404).json({ message: "Không tìm thấy đường dẫn yêu cầu." }));
 app.use(errorHandler);
 
 export default app;

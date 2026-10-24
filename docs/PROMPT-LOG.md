@@ -142,3 +142,32 @@
 | Lint | `npm run lint` | PASS — backend và frontend |
 | SQL Server integration | Kiểm tra dịch vụ local và `sqlcmd` | NOT_RUN — môi trường hiện tại không có SQL Server/`sqlcmd`; cần kiểm tra trên máy có database |
 | Dependency audit | `npm audit --omit=dev` | Không còn High sau khi nâng Zod; còn 4 Moderate cảnh báo UUID gián tiếp qua Sequelize/Tedious, cần theo dõi bản vá tương thích |
+
+## Lý do sử dụng các nhóm prompt
+
+Các prompt trong nhật ký là bản tóm lược trung thực theo yêu cầu và công việc đã thực hiện, không phải nguyên văn. Lý do chính của từng prompt:
+
+| Mục | Lý do cần prompt |
+| --- | --- |
+| 1. Đọc bối cảnh dự án | Tránh nhầm ứng dụng tuyển dụng hiện tại với vision quản lý lao động hoặc tài liệu tham khảo. |
+| 2. Đọc rubric | Chốt deliverables và tiêu chí chấm trước khi triển khai, tránh làm thiếu sản phẩm phải nộp. |
+| 3. Lưu yêu cầu | Giúp giữ rubric/stack nhất quán khi chuyển máy hoặc tiếp tục ở phiên khác. |
+| 4. Chọn phạm vi MVP | Giới hạn phạm vi vào các nghiệp vụ có quan hệ dữ liệu, phù hợp thời gian và rubric. |
+| 5. Khảo sát repository | Xác định công nghệ và trạng thái thật trước khi thay đổi, tránh ghi đè code có sẵn. |
+| 6. Chốt cách chuyển stack | Có quyết định rõ ràng trước một thay đổi kiến trúc lớn để khớp yêu cầu giảng viên. |
+| 7. Thiết kế schema | Bảo đảm các nghiệp vụ có khóa ngoại/ràng buộc và dữ liệu quan hệ thay vì lưu rời rạc. |
+| 8. Xây dựng auth | Đáp ứng yêu cầu JWT/Admin/User, đồng thời tránh người dùng tự cấp role Admin. |
+| 9. Xây CRUD và ứng tuyển | Hoàn thiện vòng nghiệp vụ chính thay vì chỉ dựng giao diện trình diễn. |
+| 10. Tìm kiếm và phân trang | Đáp ứng yêu cầu truy vấn server-side, đồng thời hạn chế tải dữ liệu không giới hạn. |
+| 11. Bảo vệ API và tài liệu | Thêm validation, giới hạn request và Swagger để API dễ kiểm tra/vấn đáp hơn. |
+| 12. Giao diện demo | Cung cấp giao diện gọi backend thật để có thể trình diễn luồng end-to-end. |
+| 13. Kiểm thử và hướng dẫn | Phân biệt phần đã kiểm chứng với phần còn cần database/manual test, tránh báo cáo PASS không có căn cứ. |
+
+Không sử dụng hoặc nộp prompt log của dự án khác làm lịch sử AI của Worker Management. Thư mục mẫu tham khảo không thuộc source/deliverables của dự án này.
+
+## Cập nhật kiểm thử trước khi chuẩn bị nộp — 24/10/2026
+
+- Unit tests: 19/19 đạt; build backend/frontend và lint đạt.
+- Tám ca kiểm thử tích hợp với SQL Server local đã đạt: đăng ký và lưu hash, validation, giới hạn password bcrypt, email trùng, đăng nhập User, `/auth/me`, role User và rate limit.
+- Đăng nhập Admin/dashboard chưa được xác nhận: mật khẩu trong database không khớp cấu hình; tùy chọn reset không chạy do mật khẩu cấu hình ngắn hơn mức seed tối thiểu 12 ký tự. Không sửa database Admin và không đưa mật khẩu vào nhật ký.
+- Chưa khẳng định đã kiểm thử toàn bộ giao diện/CRUD. Video demo cần quay các luồng đã xác minh, không giả lập kết quả.

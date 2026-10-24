@@ -45,7 +45,7 @@ export async function createCompany(input: CompanyInput) {
 export async function updateCompany(id: string, input: CompanyInput) {
   const company = await Company.findByPk(id);
   if (!company) {
-    throw new HttpError(404, "Company was not found.");
+    throw new HttpError(404, "Không tìm thấy công ty.");
   }
 
   await company.update({
@@ -60,11 +60,11 @@ export async function updateCompany(id: string, input: CompanyInput) {
 export async function deleteCompany(id: string) {
   const company = await Company.findByPk(id);
   if (!company) {
-    throw new HttpError(404, "Company was not found.");
+    throw new HttpError(404, "Không tìm thấy công ty.");
   }
 
   if (await Vacancy.count({ where: { companyId: id } })) {
-    throw new HttpError(409, "Remove or reassign this company's vacancies before deleting it.");
+    throw new HttpError(409, "Hãy xóa hoặc chuyển các vị trí tuyển dụng trước khi xóa công ty.");
   }
 
   await company.destroy();

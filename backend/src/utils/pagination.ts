@@ -7,11 +7,11 @@ export function getPagination(pageValue: unknown, pageSizeValue: unknown) {
   const pageSize = Number(pageSizeValue ?? 10);
 
   if (!Number.isInteger(page) || page < 1) {
-    throw new HttpError(400, "Page must be a positive integer.");
+    throw new HttpError(400, "Số trang phải là số nguyên dương.");
   }
 
   if (!Number.isInteger(pageSize) || pageSize < 1 || pageSize > 100) {
-    throw new HttpError(400, "Page size must be an integer between 1 and 100.");
+    throw new HttpError(400, "Số mục mỗi trang phải nằm trong khoảng 1 đến 100.");
   }
 
   return { page, pageSize, offset: (page - 1) * pageSize, limit: pageSize };
@@ -39,7 +39,7 @@ export function getOrder(
   }
 
   if (typeof sortValue !== "string") {
-    throw new HttpError(400, "Sort must be a field name followed by asc or desc.");
+    throw new HttpError(400, "Cách sắp xếp phải có dạng tên_trường:asc hoặc tên_trường:desc.");
   }
 
   const [field, direction, extra] = sortValue.split(":");
@@ -48,7 +48,7 @@ export function getOrder(
     !allowedFields.includes(field) ||
     (direction !== "asc" && direction !== "desc")
   ) {
-    throw new HttpError(400, "Sort field or direction is not supported.");
+    throw new HttpError(400, "Trường hoặc chiều sắp xếp này chưa được hỗ trợ.");
   }
 
   return [[field, direction.toUpperCase() as "ASC" | "DESC"]];

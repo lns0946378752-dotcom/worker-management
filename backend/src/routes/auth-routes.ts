@@ -12,6 +12,7 @@ const loginLimit = rateLimit({
   limit: 10,
   standardHeaders: "draft-8",
   legacyHeaders: false,
+  message: { message: "Bạn đăng nhập quá nhiều lần. Vui lòng chờ 15 phút rồi thử lại." },
 });
 
 /**

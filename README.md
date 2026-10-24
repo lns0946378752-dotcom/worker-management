@@ -111,6 +111,14 @@ npm run lint
 
 Unit tests kiểm tra validation và quy tắc pagination/sorting. Kiểm thử tích hợp với SQL Server cần database local được cấu hình.
 
+Kiểm tra luồng đăng ký/đăng nhập với SQL Server local và tài khoản Admin đã cấu hình:
+
+```powershell
+npm run test:integration
+```
+
+Lệnh này tạo rồi xóa một tài khoản kiểm thử tổng hợp; không chạy trên database production. Nếu cần đặt lại mật khẩu cho đúng tài khoản Admin local, xem [`SKILL/README.md`](./SKILL/README.md).
+
 ## Tài liệu đồ án
 
 - [Nhật ký prompt](./docs/PROMPT-LOG.md)

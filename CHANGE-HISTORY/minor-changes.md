@@ -2,6 +2,23 @@
 
 Ghi cac thay doi nho, sua loi cuc bo, dieu chinh tai lieu/cau hinh, va cac buoc kiem tra khong lam thay doi dang ke kien truc hoac pham vi san pham. Neu chi chay lenh kiem tra ma khong sua file theo doi trong Git, ghi ro la khong co thay doi ma nguon.
 
+## 2026-10-24 - Kiem thu auth voi SQL Server va chuan hoa thong bao tieng Viet
+
+- **May cap nhat:** `SANG-ADMIN`; gio local `+07:00`.
+- **Pham vi:** Viet test tich hop API auth voi SQL Server local; bo sung kiem tra gioi han password bcrypt theo byte UTF-8; thong bao API xac thuc, phan quyen, validation, rate limit, 404 va loi server bang tieng Viet co dau; validate form auth tren giao dien; them tuy chon reset password Admin chi tac dong tai khoan da co role Admin.
+- **To chuc tai lieu:** Them `SKILL/README.md` de phan biet quy tac AI, huong dan app va tai lieu tham khao; sap xep lai `PROJECT-TRACKING/README.md`.
+- **Test da chay:** `npm test` dat 19/19; backend/frontend build va lint dat; 8 ca tich hop SQL Server dat (register/persist/hash, validation, password byte limit, duplicate email, User login, `/auth/me`, role User, rate limit).
+- **Gioi han tich hop:** Admin login/dashboard chua xac nhan duoc. Hash hien tai khong khop password trong env; lenh reset tu choi chay vi password cau hinh chi co 7 ky tu, thap hon chinh sach seed toi thieu 12. Khong co thay doi nao duoc ap dung len tai khoan Admin.
+- **Bao mat:** Khong ghi email, mat khau, hash, JWT secret hoac thong tin ket noi vao lich su. Khong sua tai khoan User hay du lieu nghiep vu.
+
+## 2026-10-24 - Chuan bi bo ho so nop qua Google Drive
+
+- **May cap nhat:** `SANG-ADMIN`; gio local `+07:00`.
+- **Noi dung:** Them bao cao do an, checklist tai len Drive va kich ban video 3–5 phut trong `NOP-BAI/`; bo sung ly do su dung cho 13 muc prompt cua Worker Management.
+- **Goi source:** Tao `NOP-BAI/worker-management-source.zip` tu workspace hien tai, co source thay doi chua commit; loai `.env`, `.git`, `node_modules`, build output, thu muc mau nguoi khac va tai lieu tham khao PDF/JPG.
+- **Deliverables sao chep rieng:** `worker_management.sql` va `PROMPT-LOG.md` vao `NOP-BAI/`.
+- **Gioi han:** Chua tao/chia se Google Drive; chua co video demo; bao cao la Markdown va chi can xuat PDF neu LMS/giang vien yeu cau.
+
 ## 2026-10-24 - Cai dependencies va kiem tra ban dong bo
 
 - **May cap nhat lich su:** `SANG-ADMIN`

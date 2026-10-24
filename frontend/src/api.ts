@@ -133,6 +133,7 @@ export function getErrorMessage(error: unknown) {
       if (message.includes("does not meet the vacancy age requirement")) {
         return "Độ tuổi của bạn chưa phù hợp với yêu cầu của vị trí này.";
       }
+      if (/[À-ỹ]/.test(message)) return message;
       return "Thao tác chưa thành công. Vui lòng kiểm tra thông tin và thử lại.";
     }
     if (error.response?.status === 401) return "Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại.";

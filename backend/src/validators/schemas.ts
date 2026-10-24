@@ -1,17 +1,25 @@
 import { z } from "zod";
 
-const trimmedText = (max: number) => z.string().trim().min(1).max(max);
+const trimmedText = (max: number) => z.string().trim().min(1, "Trường này không được để trống.").max(max);
 const optionalText = (max: number) => z.string().trim().max(max).nullable().optional();
 
 export const registerSchema = z.object({
   fullName: trimmedText(120),
-  email: z.string().trim().email().max(254),
-  password: z.string().min(8).max(72),
+  email: z.string().trim().email("Vui lòng nhập địa chỉ email hợp lệ.").max(254),
+  password: z
+    .string()
+    .min(8, "Mật khẩu phải có ít nhất 8 ký tự.")
+    .max(72, "Mật khẩu không được vượt quá 72 byte.")
+    .refine((password) => Buffer.byteLength(password, "utf8") <= 72, "Mật khẩu không được vượt quá 72 byte."),
 });
 
 export const loginSchema = z.object({
-  email: z.string().trim().email().max(254),
-  password: z.string().min(1).max(72),
+  email: z.string().trim().email("Vui lòng nhập địa chỉ email hợp lệ.").max(254),
+  password: z
+    .string()
+    .min(1, "Vui lòng nhập mật khẩu.")
+    .max(72, "Mật khẩu không được vượt quá 72 byte.")
+    .refine((password) => Buffer.byteLength(password, "utf8") <= 72, "Mật khẩu không được vượt quá 72 byte."),
 });
 
 export const companySchema = z.object({
@@ -46,7 +54,7 @@ export const vacancySchema = z
       vacancy.maximumAge === null ||
       vacancy.maximumAge === undefined ||
       vacancy.minimumAge <= vacancy.maximumAge,
-    { message: "Minimum age cannot exceed maximum age.", path: ["minimumAge"] }
+    { message: "Độ tuổi tối thiểu không được lớn hơn độ tuổi tối đa.", path: ["minimumAge"] }
   );
 export type VacancyInput = z.infer<typeof vacancySchema>;
 

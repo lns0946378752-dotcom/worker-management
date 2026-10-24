@@ -12,6 +12,7 @@ const applicationLimit = rateLimit({
   limit: 5,
   standardHeaders: "draft-8",
   legacyHeaders: false,
+  message: { message: "Bạn đã gửi quá nhiều hồ sơ. Vui lòng thử lại sau một giờ." },
 });
 
 /**

@@ -53,7 +53,7 @@ export function signAccessToken(user: { id: string; email: string }) {
 export function verifyAccessToken(token: string): AccessTokenClaims {
   const claims = jwt.verify(token, jwtSecret(), { ...tokenOptions, complete: false });
   if (!hasAccessTokenClaims(claims)) {
-    throw new HttpError(401, "The bearer token is invalid or expired.");
+    throw new HttpError(401, "Phiên đăng nhập không hợp lệ hoặc đã hết hạn.");
   }
 
   return claims;

@@ -13,11 +13,11 @@ export async function createApplication(input: {
 }) {
   const vacancy = await Vacancy.findByPk(input.vacancyId);
   if (!vacancy || vacancy.status !== "open") {
-    throw new HttpError(404, "This vacancy is not accepting applications.");
+    throw new HttpError(404, "Vị trí này hiện không nhận hồ sơ.");
   }
 
   if (vacancy.genderRequirement !== "any" && vacancy.genderRequirement !== input.gender) {
-    throw new HttpError(400, "Applicant does not meet the vacancy gender requirement.");
+    throw new HttpError(400, "Giới tính của bạn chưa phù hợp với yêu cầu của vị trí này.");
   }
 
   const age = new Date().getFullYear() - input.yearOfBirth;
@@ -25,14 +25,14 @@ export async function createApplication(input: {
     (vacancy.minimumAge !== null && age < vacancy.minimumAge) ||
     (vacancy.maximumAge !== null && age > vacancy.maximumAge)
   ) {
-    throw new HttpError(400, "Applicant does not meet the vacancy age requirement.");
+    throw new HttpError(400, "Độ tuổi của bạn chưa phù hợp với yêu cầu của vị trí này.");
   }
 
   const existingApplication = await Application.findOne({
     where: { vacancyId: input.vacancyId, phone: input.phone },
   });
   if (existingApplication) {
-    throw new HttpError(409, "This phone number has already applied for the vacancy.");
+    throw new HttpError(409, "Số điện thoại này đã ứng tuyển vị trí trên.");
   }
 
   return Application.create({ ...input, status: "submitted" });
@@ -77,7 +77,7 @@ export async function updateApplicationStatus(
 ) {
   const application = await Application.findByPk(id);
   if (!application) {
-    throw new HttpError(404, "Application was not found.");
+    throw new HttpError(404, "Không tìm thấy hồ sơ ứng tuyển.");
   }
 
   await application.update({ status });

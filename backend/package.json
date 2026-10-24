@@ -9,6 +9,7 @@
     "start": "node dist/server.js",
     "lint": "eslint src",
     "test": "tsx --test src/utils/access-token.test.ts src/utils/pagination.test.ts src/validators/schemas.test.ts",
+    "test:integration": "tsx --test src/integration/auth.integration.test.ts",
     "seed:admin": "tsx src/scripts/seed-admin.ts"
   },
   "dependencies": {

@@ -50,7 +50,7 @@ export async function listVacancies(query: Record<string, unknown>) {
 export async function createVacancy(input: VacancyInput) {
   const company = await Company.findByPk(input.companyId);
   if (!company) {
-    throw new HttpError(400, "The selected company does not exist.");
+    throw new HttpError(400, "Công ty đã chọn không tồn tại.");
   }
 
   return Vacancy.create({
@@ -73,11 +73,11 @@ export async function createVacancy(input: VacancyInput) {
 export async function updateVacancy(id: string, input: VacancyInput) {
   const vacancy = await Vacancy.findByPk(id);
   if (!vacancy) {
-    throw new HttpError(404, "Vacancy was not found.");
+    throw new HttpError(404, "Không tìm thấy vị trí tuyển dụng.");
   }
 
   if (!(await Company.findByPk(input.companyId))) {
-    throw new HttpError(400, "The selected company does not exist.");
+    throw new HttpError(400, "Công ty đã chọn không tồn tại.");
   }
 
   await vacancy.update({
@@ -101,11 +101,11 @@ export async function updateVacancy(id: string, input: VacancyInput) {
 export async function deleteVacancy(id: string) {
   const vacancy = await Vacancy.findByPk(id);
   if (!vacancy) {
-    throw new HttpError(404, "Vacancy was not found.");
+    throw new HttpError(404, "Không tìm thấy vị trí tuyển dụng.");
   }
 
   if (await Application.count({ where: { vacancyId: id } })) {
-    throw new HttpError(409, "A vacancy with applications cannot be deleted.");
+    throw new HttpError(409, "Không thể xóa vị trí đã có hồ sơ ứng tuyển.");
   }
 
   await vacancy.destroy();

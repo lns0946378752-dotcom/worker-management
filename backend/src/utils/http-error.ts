@@ -11,7 +11,7 @@ export class HttpError extends Error {
 
 export function getRouteParam(value: string | string[] | undefined, name: string): string {
   if (typeof value !== "string" || value.length === 0) {
-    throw new HttpError(400, `Route parameter "${name}" is required.`);
+    throw new HttpError(400, `Thiếu thông tin "${name}" trên đường dẫn.`);
   }
 
   return value;

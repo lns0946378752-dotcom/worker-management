@@ -2,6 +2,24 @@
 
 Nhat ky nay luu cac prompt va ket qua/quyet dinh thuc te tu cac phien tiep theo khi da bat dau theo doi. Cac muc cu trong `docs/PROMPT-LOG.md` la tom luoc duoc dien dat lai, khong phai ban ghi nguyen van cua prompt lich su; khong sua chung thanh "nguyen van".
 
+## 2026-10-24 — Rà soát đăng ký, đăng nhập và tài liệu dự án
+
+### Yêu cầu người dùng
+
+> hình như skil với tracking nó đang hơi lộn xộn đúng ko, mình biết là mvp tuyển dụng mà ý là bạn đang làm gì về nó á, sửa lạo thông báo thành tiếng việt, test chức năng đăng kí đăng nhập chưa, đăng nhập/ đăng kí/ đăng nhập admin còn chưa hoàn thiện đâu đấy, bạn test hết những khả năng có thể xảy ra đi rồi fix 1 lần
+
+Người dùng nhắc lại: “tiếng việt có dấu nha” và yêu cầu làm tiếp phần đang dang dở.
+
+### Kết quả và trạng thái kiểm chứng
+
+- Tạo index `SKILL/README.md` phân biệt quy tắc AI, hướng dẫn giải thích code, tài liệu tham khảo của giảng viên và nơi tra cứu tracking; sắp xếp lại tracking index.
+- Thêm kiểm tra UI/API auth: chuẩn hóa email/họ tên; role đăng ký luôn là `user`; giới hạn password phù hợp bcrypt UTF-8; các lỗi backend API được trả bằng tiếng Việt có dấu. Admin seed mặc định không ghi đè; cờ `--reset-password` chỉ đặt lại hash cho tài khoản đã có role Admin.
+- Thêm `npm run test:integration` cho SQL Server local: đăng ký/persist/hash, validation, duplicate email, đăng nhập đúng/sai/không tồn tại, `/auth/me`, quyền User/Admin, dashboard và rate limit. Test tạo email synthetic duy nhất và xóa dữ liệu kiểm thử cụ thể.
+- Đã chạy `npm test`: 19/19 đạt; `npm run build` đạt; lint đạt sau khi sửa cảnh báo unused variable trong script seed.
+- Lượt tích hợp đầu: 7/9 ca đạt; Admin login trả 401 vì password hash trong database local không khớp biến Admin đã cấu hình; rate-limit API trả thông báo tiếng Việt và assertion test ban đầu dùng sai câu chữ. Assertion đã được sửa. Không ghi hoặc in bí mật.
+- **Chưa kết luận auth hoàn tất:** đang chạy lệnh reset password có xác nhận cho đúng tài khoản Admin local và sau đó phải chạy lại integration test. Chưa xác nhận được thao tác đăng nhập Admin thành công hay kiểm thử UI trên trình duyệt; không tuyên bố đã test mọi chức năng khác của MVP.
+- Các kiểm tra này chỉ bao phủ auth và thông báo API liên quan; chưa phải kiểm thử đầy đủ CRUD công ty/vị trí, nộp hồ sơ, dashboard trên giao diện và toàn bộ app.
+
 ## 2026-10-24 — Chot uu tien hoan thien MVP
 
 ### Prompt nguoi dung (nguyen van)

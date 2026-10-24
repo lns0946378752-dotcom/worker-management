@@ -12,10 +12,11 @@ Cap nhat: 2026-10-24 14:23 +07:00, may `SANG-ADMIN`, branch `main`; code changes
 ## Authentication va authorization
 
 - **Files chinh:** `backend/src/services/auth-service.ts`, `backend/src/utils/access-token.ts`, `backend/src/middleware/auth.ts`, `backend/src/routes/auth-routes.ts`, `frontend/src/api.ts`, `frontend/src/App.tsx`.
-- **Hanh vi:** user dang ky/dang nhap; bearer JWT; admin seed rieng; middleware xac minh token va lay role hien tai tu DB.
-- **Validation:** JWT secret toi thieu 32 ky tu; token HS256 co issuer/audience/expiry; test token nam tai `backend/src/utils/access-token.test.ts`.
-- **Han che:** frontend chi giu token trong memory; refresh trang can dang nhap lai. Chua co refresh token.
-- **Kiem tra lien quan:** `npm test` dat 18/18, `npm run build` va `npm run lint` deu dat; integration voi database can SQL Server va chua chay.
+- **Hành vi:** User đăng ký/đăng nhập; JWT bearer; Admin được tạo riêng bằng seed; middleware xác minh token và lấy role hiện tại từ database.
+- **Kiểm tra đầu vào:** JWT secret tối thiểu 32 ký tự; token HS256 có issuer/audience/thời hạn; mật khẩu đăng ký từ 8 ký tự và tối đa 72 byte UTF-8 để phù hợp bcrypt. Email được trim, chuẩn hóa chữ thường; đăng ký công khai luôn tạo role `user`.
+- **Thông báo:** lỗi xác thực, phân quyền và validation trả tiếng Việt có dấu; lỗi không xác định không làm lộ lỗi nội bộ.
+- **Hạn chế:** frontend chỉ giữ token trong bộ nhớ; tải lại trang cần đăng nhập lại. Chưa có refresh token.
+- **Kiểm tra:** unit test không cần database: `npm test`; kiểm thử luồng API với SQL Server/Admin local: `npm run test:integration`. Kiểm thử tích hợp tạo và xóa tài khoản tổng hợp; không dùng production.
 
 ## Quan ly cong ty (Admin)
 

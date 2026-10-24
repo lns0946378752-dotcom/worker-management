@@ -13,7 +13,7 @@ export async function authenticate(
   const token = authorization?.match(/^Bearer\s+(.+)$/i)?.[1].trim();
 
   if (!token) {
-    next(new HttpError(401, "A valid bearer token is required."));
+    next(new HttpError(401, "Vui lòng đăng nhập để tiếp tục."));
     return;
   }
 
@@ -21,14 +21,14 @@ export async function authenticate(
   try {
     userId = verifyAccessToken(token).sub;
   } catch (error) {
-    next(error instanceof HttpError ? error : new HttpError(401, "The bearer token is invalid or expired."));
+    next(error instanceof HttpError ? error : new HttpError(401, "Phiên đăng nhập không hợp lệ hoặc đã hết hạn."));
     return;
   }
 
   try {
     const user = await User.findByPk(userId, { attributes: ["id", "email", "role"] });
     if (!user) {
-      next(new HttpError(401, "The account for this token no longer exists."));
+      next(new HttpError(401, "Tài khoản không còn tồn tại. Vui lòng đăng nhập lại."));
       return;
     }
 
@@ -42,12 +42,12 @@ export async function authenticate(
 export function requireRole(...allowedRoles: UserRole[]) {
   return (request: Request, _response: Response, next: NextFunction) => {
     if (!request.auth) {
-      next(new HttpError(401, "Sign-in is required."));
+      next(new HttpError(401, "Vui lòng đăng nhập để tiếp tục."));
       return;
     }
 
     if (!allowedRoles.includes(request.auth.role)) {
-      next(new HttpError(403, "Your account does not have permission for this action."));
+      next(new HttpError(403, "Tài khoản của bạn không có quyền thực hiện thao tác này."));
       return;
     }
 

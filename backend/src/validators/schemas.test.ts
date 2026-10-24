@@ -18,6 +18,15 @@ test("registration rejects a weak password", () => {
   assert.equal(result.success, false);
 });
 
+test("registration rejects a password exceeding bcrypt's UTF-8 byte limit", () => {
+  const result = registerSchema.safeParse({
+    fullName: "Test User",
+    email: "test@example.com",
+    password: "á".repeat(37),
+  });
+  assert.equal(result.success, false);
+});
+
 test("registration normalizes surrounding whitespace", () => {
   const result = registerSchema.parse({
     fullName: "  Test User  ",

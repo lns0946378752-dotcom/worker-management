@@ -17,6 +17,9 @@
 - Frontend giu access token trong bo nho JavaScript; tai lai trang se mat token va can dang nhap lai. Chua co refresh token/cookie auth.
 - **Can regression khi sua:** startup validation secret; login/register; `/api/auth/me`; admin/user access; expired/invalid token; CORS/API calls.
 - **Trang thai can chu y:** Mot phan refactor JWT da ton tai o worktree truoc dot sua nay, chua commit (`backend/src/utils/access-token.ts` va cac sua doi auth). Da giu nguyen va bo sung test hoi quy; xac minh bang tests/build sau khi hoan tat.
+- **Validation/mật khẩu:** email và họ tên được chuẩn hóa; đăng ký chỉ cấp role `user`; mật khẩu bcrypt bị giới hạn tối đa 72 byte UTF-8. Seed Admin mặc định không ghi đè tài khoản; chỉ cờ `--reset-password` mới đổi hash cho tài khoản đã là Admin khớp `ADMIN_EMAIL`.
+- **Thông báo API:** lỗi nghiệp vụ, validation, xác thực/phân quyền, rate limit và 404 đã chuyển sang tiếng Việt có dấu; lỗi máy chủ trả câu chung, chi tiết vẫn chỉ ghi log phía server.
+- **Test tích hợp:** `npm run test:integration` chạy với SQL Server local, bao gồm đăng ký, hash/persist, duplicate, email sai/đúng, token, User/Admin role, dashboard và rate limit. Không chạy trên production; tài khoản kiểm thử được xóa sau test.
 
 ## Database va cau hinh
 
@@ -43,7 +46,7 @@
 
 - Lenh tu repo root: `npm test`, `npm run build`, `npm run lint`.
 - Tich hop database that chua duoc kiem chung neu may nay chua cau hinh SQL Server va `.env`.
-- Ket qua sau dashboard: unit tests 18/18, build backend/frontend, lint va `git diff --check` deu dat. Ngay 2026-10-24 da kiem tra SQL Server Express local: API health, Admin login va dashboard counts thanh cong.
+- Kết quả gần nhất trước đợt auth: unit test 19/19 và build backend/frontend đã đạt. Lint đang được chạy lại sau khi sửa script seed; kiểm thử tích hợp từng xác nhận đăng ký/User/token/rate limit, nhưng lượt đầu phát hiện mật khẩu Admin trong DB khác `.env`, nên luồng đăng nhập Admin chưa thể đạt trước khi reset local.
 - `.env` local o repo root da duoc tao va Git ignore; SQL login rieng `worker_management_app` chi co quyen doc/ghi trong DB. Khong dung `sa`, khong commit/share secrets, khong public SQL Server ra Internet.
 
 ## Admin dashboard
