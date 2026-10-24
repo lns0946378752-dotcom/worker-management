@@ -84,3 +84,14 @@ Ghi cac thay doi nho, sua loi cuc bo, dieu chinh tai lieu/cau hinh, va cac buoc 
 - **Noi dung:** Cap nhat README, `.env.example`, roadmap va impact docs; them huong dan deploy API Node rieng va frontend Vercel, variables can thiet, RLS va smoke test.
 - **Kiem chung:** `npm run build`, `npm test` (18/18), `npm run lint`, runtime dialect probes (postgres opt-in, mssql default). PostgreSQL hosted integration chua duoc chay.
 - **Trang thai:** Chua co project/provider credentials; chua deploy.
+
+## 2026-10-24 - Viet huong dan setup deploy cho nguoi moi
+
+- **May cap nhat lich su:** `SANG-ADMIN`
+- **Thoi diem ghi nhan:** `2026-10-24 17:01 +07:00`
+- **Repository/branch/commit lien quan:** `lns0946378752-dotcom/worker-management`, `main`, sau commit `df4bfbc`
+- **Prompt nguoi dung:** “tạo cho tôi 1 file hướng dẫn chuẩn bị và cài môi trường trên các tool như vercal, supabase vì tôi chưa rành cách dùng và cũng chưa hiểu rõ cách dùng, làm giờ luôn nha”
+- **Noi dung:** Mo rong `SKILL/Online-Demo-Deployment.md` thanh huong dan tung buoc cho GitHub, Supabase/Postgres schema, Render Express API, Vercel Vite frontend, tao Admin demo, smoke tests va xu ly loi.
+- **Kiem chung:** Kiem tra noi dung huong dan va `git diff --check`; day la documentation-only change.
+- **Gioi han:** Chua tao account/project/provider va chua thuc hien deploy; user tu tao account, tu nhap secrets. Khong chon plan tinh phi.
+- **Trang thai Git:** Chua commit/push phien ban huong dan expanded nay.

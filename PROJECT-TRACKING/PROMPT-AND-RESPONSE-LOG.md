@@ -138,3 +138,11 @@ Nguoi dung dinh chinh thoi han thuc la 17:10 ngay 2026-10-24, khong phai moc 14:
 - Them `SKILL/Online-Demo-Deployment.md`, README link va tracking/change history.
 - Build/lint/test dat; dialect probe xac nhan PostgreSQL opt-in va MSSQL default.
 - Chua tao project Vercel/Supabase/Node host, chua co secrets, chua deploy va chua test ket noi PostgreSQL. Buoc tiep theo can nguoi dung tao/cung cap ten project va domain public (khong gui secret); database connection credentials chi nhap truc tiep vao provider environment dashboard.
+
+### Yeu cau bo sung — huong dan setup cho nguoi moi
+
+> tạo cho tôi 1 file hướng dẫn chuẩn bị và cài môi trường trên các tool như vercal, supabase vì tôi chưa rành cách dùng và cũng chưa hiểu rõ cách dùng, làm giờ luôn nha
+
+- Mo rong `SKILL/Online-Demo-Deployment.md` voi cac buoc tao Supabase DB, chay schema PostgreSQL, lay Session Pooler settings, tao Render API host, import monorepo len Vercel, cau hinh env/CORS, tao Admin demo va smoke test.
+- Da ghi ro trade-off SQL Server/Postgres, bao mat secrets, RLS, free-tier/cold-start va troubleshooting.
+- Khong co account hay cloud project nao duoc tao tu phien nay; chua thuc hien deploy. Cac buoc can user tu thao tac tren tai khoan va khong chia se secrets.

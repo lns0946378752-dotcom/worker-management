@@ -1,78 +1,136 @@
-# Deploy ban demo online
+# Huong dan chuan bi moi truong deploy demo
 
-## So do
-
-- Vercel: frontend Vite.
-- Render (hoac Node host tuong duong): Express API.
-- Supabase: PostgreSQL.
-
-Vercel khong host tien trinh Express dai han; API can mot Node web service rieng. Supabase PostgreSQL khac SQL Server; deploy demo nay la chuyen database, khong con dung SQL Server.
-
-## 1. Tao database Supabase
-
-1. Tao project moi trong Supabase.
-2. Mo SQL Editor va chay `database/supabase_schema.sql` mot lan.
-3. Lay connection details PostgreSQL tu Project Settings > Database. Neu Render khong ket noi duoc direct endpoint, dung Session pooler de tranh mot-so-han-che IPv4 cua direct endpoint; lay dung host, port va username hien trong Supabase.
-4. Khong dua connection string/password vao Git, screenshot, prompt hay browser frontend.
-
-## 2. Cau hinh API host
-
-Tao Node web service tu GitHub repo, root o repository root. Build command:
+Tai lieu nay danh cho nguoi moi, theo tung buoc de co website recruitment demo truy cap duoc tu Internet:
 
 ```text
-npm install && npm run build --workspace @worker-management/api
+Trinh duyet -> Vercel (React/Vite) -> Render (Express API) -> Supabase (PostgreSQL)
 ```
 
-Start command:
+Vercel chi host frontend trong setup nay; Express API can Node host rieng. Supabase PostgreSQL khac SQL Server dang chay local. Cac thay doi trong repository cho phep Sequelize chon PostgreSQL cho demo, con local van mac dinh SQL Server.
 
-```text
-npm run start --workspace @worker-management/api
-```
+> Day la nhanh deploy tam thoi theo lua chon cua nguoi dung de kip bao cao. Neu rubric bat buoc SQL Server, can noi ro database demo online dung PostgreSQL va xac nhan voi giang vien truoc khi nop chinh thuc.
 
-Dat environment variables trong dashboard host (khong trong source):
+## 0. Chuan bi tai khoan va source
 
-```text
-NODE_ENV=production
-DB_DIALECT=postgres
-DB_SERVER=<Supabase database host>
-DB_PORT=<Supabase port>
-DB_NAME=postgres
-DB_USER=<Supabase database user>
-DB_PASSWORD=<secret>
-DB_SSL=true
-DB_SSL_REJECT_UNAUTHORIZED=true
-JWT_SECRET=<random secret, at least 32 characters>
-CLIENT_ORIGIN=<Vercel production URL>
-ADMIN_NAME=Project Administrator
-ADMIN_EMAIL=<demo admin email>
-ADMIN_PASSWORD=<strong password, at least 12 characters>
-```
+Can co tai khoan GitHub (repo `lns0946378752-dotcom/worker-management`), Vercel, Supabase va Render. Dang nhap cac dich vu bang tai khoan cua ban. Dung goi Free neu hien co va phu hop; khong nhap the, khong kich hoat paid plan/trial tinh phi neu chua dong y.
 
-Khong expose `SUPABASE_SERVICE_ROLE_KEY` cho frontend; app dung PostgreSQL connection chi tu API host.
+Code deploy da duoc push tai commit `df4bfbc` tren nhanh `main`. Neu Vercel/Render khong thay commit, vao GitHub kiem tra nhanh `main` co commit do.
 
-Admin seed la lenh one-time `npm run seed:admin` voi environment variables tro den remote DB; chi chay mot lan va khong ghi secrets vao repo.
+Tuyet doi khong paste `.env`, database password, JWT secret, access token hay Supabase service-role key vao chat, GitHub, anh chup man hinh, hoac bien `VITE_*`. Chi nhap database credential vao phan Environment Variables cua backend host.
 
-## 3. Deploy frontend Vercel
+## 1. Tao database PostgreSQL tren Supabase
 
-- Import GitHub repo.
-- Root Directory: repository root.
-- Framework preset: Vite.
-- Build command: `npm run build --workspace @worker-management/web`.
-- Output directory: `frontend/dist`.
-- Add `VITE_API_URL=https://<api-host>/api`, sau do deploy lai.
+1. Dang nhap Supabase, chon **New project**.
+2. Chon organization, dat ten project (vi du `worker-management-demo`) va password database manh. Luu password vao password manager rieng; khong dung lai password email/GitHub.
+3. Chon region gan ban nhat neu co. Cho den khi project bao san sang.
+4. Mo **SQL Editor** → **New query**.
+5. Tren GitHub, mo `database/supabase_schema.sql` trong commit `df4bfbc`, copy toan bo noi dung vao SQL Editor va bam **Run** mot lan.
+6. Mo **Table Editor** va xac nhan co cac bang `users`, `companies`, `vacancies`, `applications`. Du lieu cong ty/vacancy/application mau la synthetic; khong nhap ho so nguoi that.
+7. Vao **Project Settings** → **Database** → **Connect**. Lay thong tin **Session pooler** neu duoc cung cap (de tranh mot so host khong truy cap duoc direct endpoint qua IPv4). Ghi tam cac truong host, port, database, username vao noi an toan. Khong chup/man hinh chia se phan password.
 
-Backend CORS `CLIENT_ORIGIN` phai khop chinh xac domain Vercel production.
+Khong chay `database/worker_management.sql` tren Supabase; file do la T-SQL cho SQL Server, khong phai PostgreSQL. Schema Supabase da bat Row Level Security va khong tao policy truy cap cong khai. Backend se ket noi database server-side, khong can Supabase anon/service-role key.
 
-## 4. Smoke test
+## 2. Deploy Express API tren Render
 
-1. Mo `https://<api-host>/health`, xac nhan `{ "status": "ok" }`.
-2. Mo Vercel URL, dang nhap bang demo Admin, kiem tra vacancies/dashboard.
-3. Thu dang ky user va nop don voi thong tin synthetic; khong dung PII that.
-4. Kiem tra deploy logs neu loi ket noi DB; khong paste credential vao ticket/chat.
+1. Dang nhap Render bang GitHub, chon **New** → **Web Service**, ket noi repo nay, nhanh `main`.
+2. Cau hinh service:
 
-## Ghi chu
+   | Muc | Gia tri |
+   |---|---|
+   | Root Directory | de trong (repository root) |
+   | Runtime | Node |
+   | Build Command | `npm install && npm run build --workspace @worker-management/api` |
+   | Start Command | `npm run start --workspace @worker-management/api` |
 
-- Local SQL Server mode van la mac dinh (`DB_DIALECT=mssql`); PostgreSQL mode bat bang `DB_DIALECT=postgres`.
-- Supabase schema la script rieng, khong chay script SQL Server tren PostgreSQL.
-- Free plans co gioi han va chinh sach thay doi; kiem tra dieu kien hien tai, khong chon paid plan hay nhap billing neu chua dong y.
-- Ban deploy Supabase/PostgreSQL co the khac stack SQL Server ma rubric yeu cau; can thong bao day la demo deploy tam thoi va xac nhan lai voi giang vien truoc ban nop chinh thuc.
+3. Truoc khi deploy, them cac Environment Variables sau trong Render. Thay placeholder bang dung gia tri tu Supabase; khong them dau ngoac `< >`.
+
+   | Key | Gia tri |
+   |---|---|
+   | `NODE_ENV` | `production` |
+   | `DB_DIALECT` | `postgres` |
+   | `DB_SERVER` | host Session pooler cua Supabase |
+   | `DB_PORT` | port Session pooler, dung gia tri dashboard cung cap |
+   | `DB_NAME` | database name dashboard cung cap, thuong la `postgres` |
+   | `DB_USER` | username pooler dashboard cung cap |
+   | `DB_PASSWORD` | password database Supabase |
+   | `DB_SSL` | `true` |
+   | `DB_SSL_REJECT_UNAUTHORIZED` | `true` |
+   | `JWT_SECRET` | secret ngau nhien rieng, dai toi thieu 32 ky tu |
+   | `CLIENT_ORIGIN` | tam thoi `http://localhost:5173`; sau nay thay bang Vercel URL |
+
+   Khong can dat `PORT`; Render tu cap port. Tao JWT secret bang password manager/generator, khong dung database password. Khong them `ADMIN_PASSWORD` neu se tao Admin theo buoc 4.
+
+4. Chon **Create Web Service** va xem tab **Logs**. Build phai thanh cong va service phai bao live.
+5. Copy domain public cua service, vi du `https://<ten-service>.onrender.com`. Mo `https://<ten-service>.onrender.com/health`; ket qua mong doi la `{"status":"ok"}`.
+
+Neu service khong khoi dong, mo Logs va doc loi. Loi xac thuc DB: doi chieu host/port/username/password va dam bao dung Session pooler. Khong in/paste gia tri secrets de gui debug.
+
+## 3. Deploy frontend tren Vercel
+
+1. Dang nhap Vercel bang GitHub, chon **Add New** → **Project**.
+2. Import repository `worker-management`, branch `main`.
+3. Chon cau hinh:
+
+   | Muc | Gia tri |
+   |---|---|
+   | Root Directory | `.` (repo root) |
+   | Framework Preset | Vite |
+   | Install Command | `npm install` |
+   | Build Command | `npm run build --workspace @worker-management/web` |
+   | Output Directory | `frontend/dist` |
+
+4. Trong **Environment Variables**, them:
+
+   | Key | Gia tri |
+   |---|---|
+   | `VITE_API_URL` | `https://<ten-service>.onrender.com/api` |
+
+5. Bam **Deploy**, cho den khi build hoan tat va copy production URL Vercel, vi du `https://<project>.vercel.app`.
+6. Quay lai Render → **Environment**, sua `CLIENT_ORIGIN` thanh dung origin Vercel (chi domain, khong them `/` hay `/api`), luu thay doi va redeploy/restart API.
+
+Vercel URL la cong khai. Chi dung data mau. Neu thay doi `VITE_API_URL`, can redeploy frontend de Vite nhung gia tri moi vao ban build.
+
+## 4. Tao tai khoan Admin demo tren database online
+
+Khong dung password Admin local. Tao tai khoan rieng cho demo online:
+
+1. Mo Vercel website va dang ky tai khoan demo voi email do ban quan ly va password manh. Dang ky mac dinh la role `user`.
+2. Trong Supabase, mo **SQL Editor**, chay truy van sau va thay email bang email vua dang ky:
+
+   ```sql
+   UPDATE public.users
+   SET role = 'admin', updated_at = NOW()
+   WHERE email = lower('your-demo-email@example.com')
+   RETURNING id, email, role;
+   ```
+
+3. Xac nhan chi mot row cua dung tai khoan demo duoc tra ve. Dang xuat va dang nhap lai tren website de giao dien nap role Admin.
+
+Chi chay truy van nay cho tai khoan cua ban tren project demo. Khong tao tai khoan cho nguoi khac hay dung email/password that cua ho.
+
+## 5. Kiem tra truoc khi bao cao
+
+1. API health: `https://<ten-service>.onrender.com/health` phai tra `status: ok`.
+2. API docs: `https://<ten-service>.onrender.com/api-docs`.
+3. Vercel website load danh sach viec; dang nhap Admin; tab Tong quan hien metrics.
+4. Tao mot user demo moi, dang xuat, nop don ung tuyen bang synthetic data.
+5. Admin xem don va thay doi status; bam lam moi dashboard.
+6. Thu dong/mo lai tab va truy cap website tu dien thoai/mang khac.
+7. Truoc buoi bao cao, mo website/API truoc va kiem tra lai DB. Free service co the ngu hoac cold start; tinh nang, quota va chinh sach mien phi co the thay doi.
+
+## Loi thuong gap
+
+- **`localhost` tren website online:** sai API URL. Vercel `VITE_API_URL` phai tro toi domain Render cong khai.
+- **CORS 403:** `CLIENT_ORIGIN` tren Render phai khop origin Vercel production, khong co slash cuoi.
+- **API restart/error connect:** xem Render Logs; xac nhan DB env values va Supabase network/SSL. Khong sua bang cach public SQL Server local.
+- **Vercel build fail:** xac nhan Root Directory la repo root, build command workspace dung, output `frontend/dist`.
+- **Khong thay dashboard Admin sau khi doi role:** dang xuat/dang nhap lai de frontend cap nhat account role.
+- **Website phan hoi cham lan dau:** free Node host co the sleep; truy cap `/health` truoc roi tai lai website.
+
+## An toan va trade-off
+
+- `.env` hien tai van chua thong tin SQL Server local; khong sua/noi credential Supabase vao file do. Hosted secrets chi cau hinh tai dashboard Render/Supabase.
+- Khong commit `.env`, password, database URL hay JWT secret. Khong de `DATABASE_URL`/Supabase service key trong bien `VITE_*` vi Vite se dua gia tri vao JS frontend cong khai.
+- Khong ket noi frontend truc tiep toi database; moi thao tac di qua Express API.
+- PostgreSQL demo khac SQL Server yeu cau goc cua rubric. Neu can demo dung DBMS rubric, sau nay chon SQL Server hosting va chuyen env sang MSSQL; Sequelize van duoc giu.
+- Chua co provider account/project nao duoc tao boi repository. Can chu tai khoan tu tao va tu nhap secrets; khong nhap billing/paid plan neu chua dong y.
