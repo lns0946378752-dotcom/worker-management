@@ -30,15 +30,25 @@
 - **Huong trien khai de xuat, chua chot nha cung cap:** deploy frontend, Express API va SQL Server tuong thich (vi du Azure SQL) len cac dich vu online; dat API URL/CORS va credentials qua environment variables cua hosting. Nen de API noi toi database qua ket noi/private network neu nha cung cap ho tro; khong public SQL port truc tiep.
 - Cac lua chon hosting, tai khoan/chi phi, domain va cach migrate schema/data tu laptop len cloud chua duoc xac nhan. Khong tu tao tai khoan, bat dau trial tinh phi, hay dua secret vao Git.
 
+### Demo online tam thoi (2026-10-24)
+
+- Nguoi dung chon uu tien co ban online som: Vercel frontend + Node API host rieng + Supabase PostgreSQL.
+- `backend/src/config/database.ts` van mac dinh `DB_DIALECT=mssql` cho local; `DB_DIALECT=postgres` bat PostgreSQL cho hosted demo. Sequelize van la ORM.
+- `database/supabase_schema.sql` la schema Postgres rieng, khong duoc chay `worker_management.sql` (T-SQL) tren Supabase.
+- Day la thay doi DBMS so voi SQL Server rubric; demo nay chi dung de bao cao som neu chap nhan compromise. Khong migrate/copy data ung vien that; chi dung synthetic data.
+- Supabase RLS duoc bat tren cac bang; API su dung ket noi Postgres server-side, khong expose DB credentials hoac Supabase service key ra frontend.
+- Chua co project/provider/account duoc tao; khong co secrets cung cap. Chua deploy hay chay PostgreSQL integration test.
+
 ## Build va checks
 
 - Lenh tu repo root: `npm test`, `npm run build`, `npm run lint`.
 - Tich hop database that chua duoc kiem chung neu may nay chua cau hinh SQL Server va `.env`.
-- Ket qua sau dashboard: unit tests 18/18, build backend/frontend, lint va `git diff --check` deu dat; ket noi SQL Server that chua duoc chay tren may nay do khong co `.env` o repo root/`backend/`.
+- Ket qua sau dashboard: unit tests 18/18, build backend/frontend, lint va `git diff --check` deu dat. Ngay 2026-10-24 da kiem tra SQL Server Express local: API health, Admin login va dashboard counts thanh cong.
+- `.env` local o repo root da duoc tao va Git ignore; SQL login rieng `worker_management_app` chi co quyen doc/ghi trong DB. Khong dung `sa`, khong commit/share secrets, khong public SQL Server ra Internet.
 
 ## Admin dashboard
 
 - `GET /api/dashboard` la API moi, dung chung authenticate/role middleware; chi Admin duoc truy cap. Middleware truy van role hien tai tu database, khong tin role do client tu gui.
 - Service dem cong ty, vacancy va application bang Sequelize; UI chi hien so tong hop/status, khong tra PII.
 - **Can kiem tra regression khi sua:** user/guest khong doc duoc API; Admin nhin thay so khop SQL; lam moi cap nhat ket qua; loi ket noi DB duoc hien ro; UI van dung tren man hinh nho.
-- Hien chua co SQL Server ket noi de kiem chung endpoint hoac so lieu thuc te.
+- SQL Server local da ket noi; Admin login va metrics dashboard da duoc xac nhan tren DB sample. Chua kiem tra role User/Guest hoac thay doi metrics qua UI.

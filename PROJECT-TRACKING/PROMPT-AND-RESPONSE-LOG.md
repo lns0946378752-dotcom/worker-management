@@ -101,6 +101,40 @@ Nguoi dung dinh chinh thoi han thuc la 17:10 ngay 2026-10-24, khong phai moc 14:
 - Them dashboard Admin cho Company/Vacancy/Application: count tong va theo status, API `GET /api/dashboard` co JWT + role Admin, giao dien co tab Tong quan va nut Lam moi.
 - So lieu lay truc tiep tu Sequelize/SQL Server; khong hardcode va khong hien PII.
 - Them huong dan `SKILL/Recruitment-Dashboard.md`; cap nhat README, roadmap, checklist 6 buoc va impact/history.
-- Unit test/build/lint: `npm test` dat 18/18; `npm run build`, `npm run lint` va `git diff --check` deu dat. Chua chay SQL Server integration hoac browser manual test; khong co `.env` o repo root/`backend/`.
+- Unit test/build/lint: `npm test` dat 18/18; `npm run build`, `npm run lint` va `git diff --check` deu dat. SQL Server/browser integration luc ghi nhat ky dashboard chua chay; sau do SQL Server local da duoc cau hinh va test thanh cong (ghi o muc 15:56).
 - Files code chinh: `backend/src/routes/dashboard-routes.ts`, `backend/src/controllers/dashboard-controller.ts`, `backend/src/services/dashboard-service.ts`, `frontend/src/api.ts`, `frontend/src/App.tsx`, `frontend/src/styles.css`.
-- Git: thay doi chua commit/push; commit goc luc bat dau la `98e9625` tren `main`.
+- Git: dashboard va tracking da duoc commit/push tai `90536fa` tren `main`.
+
+## 2026-10-24 15:56 — Chuyen SQL Server sang may chay VS Code de kip kiem thu
+
+### Prompt nguoi dung (nguyen van)
+
+> sql bên kia ko connect được phải chạy ngay trên máy này thôi, 16h00 rồi
+
+### Phan hoi va ket qua thuc te
+
+- SQL Server Express `SQLEXPRESS` da cai va dang chay tren may nay; Windows Authentication ket noi thanh cong.
+- Chay `database/worker_management.sql`; database `WorkerManagement` va cac bang `users`, `companies`, `vacancies`, `applications` san sang.
+- Tao login rieng `worker_management_app`, chi quyen doc/ghi tren database; tao `.env` o repo root va Admin seed `admin@worker.local`. Credential/JWT secret sinh ngau nhien, khong in ra hay commit.
+- Khoi dong `npm run dev`: API health `ok`, frontend HTTP 200; Admin login va dashboard API hoat dong, metrics sample 2 companies / 2 vacancies / 1 application.
+- Database la local tren may `SANG-ADMIN`, khong phai database laptop va khong tu dong dong bo qua Git. Chua manual test CRUD tren browser.
+
+## 2026-10-24 16:49 — Uu tien deploy demo online bang Supabase
+
+### Prompt nguoi dung (nguyen van)
+
+> vậy giờ hướng dẫn tôi tạo hosting bằng vercal, với supabase trước đi, hnay chỉ là báo cáo nên chưa vội mua các cái kia, quan trọng là deloy được xong mới tiến hành fix lỗi, nhiều lần mình fix lỗi trước tới lúc còn vài phút không deloy được thì dở người
+
+> vậy giờ hướng dẫn tôi tạo hosting bằng vercal, với supabase trước đi, hnay chỉ là báo cáo nên chưa vội mua các cái kia, quan trọng là deloy được xong mới tiến hành fix lỗi, nhiều lần mình fix lỗi trước tới lúc còn vài phút không deloy được thì dở người, còn nữa, những chức năng hiện có cái nào cũng lỗi, cho tôi 1 bảng mẫu để tôi điền chức năng gì lỗi gì và sẽ gửi ảnh cho bạn
+
+### Quyết định được người dùng chọn
+
+- Nguoi dung chon huong 1: Vercel frontend + Supabase PostgreSQL + Node host rieng cho Express; uu tien ban demo nhanh/loi ich thuc te, chap nhan trade-off DBMS neu can.
+
+### Phan hoi va ket qua thuc te
+
+- Them Sequelize dialect PostgreSQL tuy chon; MSSQL van la mac dinh cho local hien tai.
+- Them `database/supabase_schema.sql`, bat RLS va seed du lieu mau tong hop.
+- Them `SKILL/Online-Demo-Deployment.md`, README link va tracking/change history.
+- Build/lint/test dat; dialect probe xac nhan PostgreSQL opt-in va MSSQL default.
+- Chua tao project Vercel/Supabase/Node host, chua co secrets, chua deploy va chua test ket noi PostgreSQL. Buoc tiep theo can nguoi dung tao/cung cap ten project va domain public (khong gui secret); database connection credentials chi nhap truc tiep vao provider environment dashboard.

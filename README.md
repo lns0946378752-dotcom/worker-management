@@ -16,7 +16,7 @@ Quan hệ nghiệp vụ chính: `Company 1-n Vacancy`, `Vacancy 1-n Application`
 ## Công nghệ
 
 - Node.js, TypeScript, Express.js
-- SQL Server, Sequelize ORM (dialect MSSQL)
+- Sequelize ORM; local SQL Server (MSSQL) and optional PostgreSQL mode for the temporary online demo
 - React, Vite, Axios
 - JWT, bcrypt, Zod, Swagger UI
 
@@ -121,5 +121,8 @@ Unit tests kiểm tra validation và quy tắc pagination/sorting. Kiểm thử 
 - [Hướng dẫn kết nối backend tới SQL Server trên laptop](./SKILL/SQL-Server-Remote-Setup.md)
 - [Hướng dẫn JWT](./SKILL/JWT-Authentication-Flow.md) và [luồng CRUD Admin](./SKILL/Admin-CRUD-Flow.md)
 - [Hướng dẫn dashboard tuyển dụng Admin](./SKILL/Recruitment-Dashboard.md)
+- [Hướng dẫn deploy demo Vercel + API host + Supabase](./SKILL/Online-Demo-Deployment.md)
+
+The optional PostgreSQL mode is a deployment workaround for the demo, not a replacement for the instructor's SQL Server requirement. Keep local `.env` on `DB_DIALECT=mssql` unless explicitly testing the hosted PostgreSQL environment.
 
 Thông tin hồ sơ dùng trong dữ liệu mẫu là giả. Không đưa CCCD, tài khoản ngân hàng hay dữ liệu cá nhân thật vào database demo.

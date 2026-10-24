@@ -12,6 +12,6 @@ try {
     console.info(`Swagger UI available at http://localhost:${port}/api-docs`);
   });
 } catch (error) {
-  console.error("Could not start the API. Check SQL Server and the DB_* environment settings.", error);
+  console.error("Could not start the API. Check the database and the DB_* environment settings.", error);
   process.exitCode = 1;
 }

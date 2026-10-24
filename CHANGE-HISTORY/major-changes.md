@@ -60,3 +60,15 @@ Chi ghi cac thay doi lam thay doi dang ke kien truc, cong nghe, pham vi chuc nan
 - **Tai lieu:** Cap nhat README, roadmap, six-step checklist va tracking; them huong dan `SKILL/Recruitment-Dashboard.md`.
 - **Kiem chung:** `npm test` dat 18/18; `npm run build`, `npm run lint` va `git diff --check` deu dat. SQL Server integration va browser test chua duoc chay; khong tim thay `.env` o repo root hoac `backend/`.
 - **Trang thai Git:** Chua commit/push; co cac thay doi khac trong worktree tu cac dot truoc, duoc giu nguyen.
+
+## 2026-10-24 - Them PostgreSQL mode de chuan bi deploy demo
+
+- **May cap nhat lich su:** `SANG-ADMIN`
+- **Thoi diem ghi nhan:** `2026-10-24 16:56 +07:00`
+- **Repository/branch/commit lien quan:** `lns0946378752-dotcom/worker-management`, `main`, sau commit `90536fa`
+- **Nguon/quyet dinh:** Nguoi dung chon huong Vercel + Supabase PostgreSQL va uu tien demo online som; dong y khong can giu toan bo yeu cau SQL Server neu can trade-off.
+- **Noi dung:** Them `pg` driver va cho phep Sequelize chon `DB_DIALECT=postgres`; `mssql` van la mac dinh de giu local. Them schema Supabase rieng voi du lieu mau tong hop va bat RLS; khong dung SQL Server T-SQL tren Postgres. Doi age fields sang SMALLINT de cung model tuong thich hai DBMS.
+- **Kien truc deploy du kien:** Vercel frontend + host Node rieng cho Express API + Supabase Postgres. Vercel khong tu host API Express persistent.
+- **Tai lieu:** Them `SKILL/Online-Demo-Deployment.md`, link README va cap nhat tracking.
+- **Kiem chung:** Build, 18 unit tests, lint dat; runtime dialect probe xac nhan PostgreSQL mode va mac dinh MSSQL. Chua tao project Supabase/host, chua ket noi/test schema Postgres that, chua deploy.
+- **Trade-off:** Ban demo PostgreSQL khac DBMS SQL Server trong rubric; can neu ro trong bao cao va quay lai SQL Server cho ban nop neu giang vien yeu cau.

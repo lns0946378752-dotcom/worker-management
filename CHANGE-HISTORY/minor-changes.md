@@ -64,3 +64,23 @@ Ghi cac thay doi nho, sua loi cuc bo, dieu chinh tai lieu/cau hinh, va cac buoc 
 - **Noi dung:** Cap nhat README/API table, roadmap, checklist 6 buoc va impact notes; them huong dan cach dashboard Admin lay/hien thi metrics va cac buoc can kiem thu.
 - **Kiem chung:** `npm test` dat 18/18; `npm run build`, `npm run lint` va `git diff --check` deu dat. Chua test SQL Server/browser.
 - **Trang thai:** Chua commit/push.
+
+## 2026-10-24 - Khoi tao SQL Server local va kiem thu dashboard
+
+- **May cap nhat lich su:** `SANG-ADMIN`
+- **Thoi diem ghi nhan:** `2026-10-24 15:58 +07:00`
+- **Repository/branch/commit lien quan:** `lns0946378752-dotcom/worker-management`, `main`, `90536fa`
+- **Noi dung:** Chay script database tren SQL Server Express `SQLEXPRESS`; tao database `WorkerManagement`; tao SQL login rieng cho app, `.env` local va tai khoan Admin seed.
+- **Bao mat:** Login chi du quyen `db_datareader`/`db_datawriter` tren database nay; khong dung `sa`. Credential/JWT secret sinh ngau nhien, khong in ra terminal, khong commit. `.env` da duoc Git ignore.
+- **Kiem chung:** Tables users/companies/vacancies/applications ton tai; API `/health` tra `ok`; frontend HTTP 200; Admin login va dashboard API thanh cong, metrics 2 companies / 2 vacancies / 1 application.
+- **Han che:** Chua manual test CRUD tren browser. Database va credential chi co tren may nay, khong tu dong dong bo sang laptop.
+- **Trang thai Git:** Tracking docs chua commit/push; `.env` va PDF cua giang vien khong duoc dua vao Git.
+
+## 2026-10-24 - Them huong dan deploy Vercel/API/Supabase
+
+- **May cap nhat lich su:** `SANG-ADMIN`
+- **Thoi diem ghi nhan:** `2026-10-24 16:56 +07:00`
+- **Repository/branch/commit lien quan:** `lns0946378752-dotcom/worker-management`, `main`, sau commit `90536fa`
+- **Noi dung:** Cap nhat README, `.env.example`, roadmap va impact docs; them huong dan deploy API Node rieng va frontend Vercel, variables can thiet, RLS va smoke test.
+- **Kiem chung:** `npm run build`, `npm test` (18/18), `npm run lint`, runtime dialect probes (postgres opt-in, mssql default). PostgreSQL hosted integration chua duoc chay.
+- **Trang thai:** Chua co project/provider credentials; chua deploy.

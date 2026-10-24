@@ -2,7 +2,7 @@
 
 Nguon tham chieu: `SKILL/6 bước triển khai dự án phần mềm (1).pdf` (22 trang). Checklist nay doi chieu quy trinh trong PDF voi repo hien tai, khong coi vi du cong nghe/nghiep vu trong bai giang la yeu cau moi cua do an.
 
-Cap nhat: 2026-10-24 15:32 +07:00, may `SANG-ADMIN`, branch `main`, HEAD `98e9625` (cac thay doi trong dot nay chua commit).
+Cap nhat: 2026-10-24 15:58 +07:00, may `SANG-ADMIN`, branch `main`, HEAD `90536fa`.
 
 ## Buoc 1 — Y tuong va tinh kha thi
 
@@ -46,7 +46,9 @@ Cap nhat: 2026-10-24 15:32 +07:00, may `SANG-ADMIN`, branch `main`, HEAD `98e962
 
 - **Trang thai:** Code da chia theo module; build/lint/test da chay; tracking va prompt history dang duoc bo sung.
 - **Da kiem chung sau dashboard:** 18 unit tests, backend/frontend production build, lint va `git diff --check` deu PASS.
-- **Chua kiem chung:** Integration/CRUD thuc te voi SQL Server; UI Admin tren browser; deploy online. Khong co `.env` o repo root/`backend/` trong moi truong hien tai.
+- **Da kiem chung:** SQL Server local `SQLEXPRESS`; API health, frontend HTTP, dang nhap Admin va `GET /api/dashboard` deu hoat dong voi SQL Server.
+- **Chua kiem chung:** CRUD qua browser, responsive tren cac kich thuoc man hinh va deploy online.
+- **Moi truong:** `.env` local o repo root, bi Git ignore; SQL login rieng cho app, khong dung `sa`. Khong commit/chia se file nay.
 - **Can lam:** Luu prompt thuc te moi va ly do; review tung diff; doi chieu AC; demo module nho; bo sung tests cho loi/phan quyen. Khong ghi prompt cu thanh nguyen van neu chi con tom tat.
 - **Tham chieu:** PDF trang 19–22.
 

@@ -16,7 +16,7 @@ Code hien tai tap trung vao Company -> Vacancy -> Application. Hoan thien va dem
 2. Public xem/tim/loc viec va cong ty.
 3. Admin them/sua/xoa cong ty va vi tri; rang buoc khong xoa du lieu dang lien ket.
 4. Ung vien nop ho so; admin xem va cap nhat trang thai.
-5. **Dashboard tuyen dung cho Admin (da them):** tong cong ty, vi tri dang mo/tam dung/dong, tong ho so va dem theo trang thai. API Admin-only lay so dem truc tiep tu database; khong hien PII hay tao so lieu gia. SQL Server integration va thao tac UI thuc te van can kiem tra khi DB san sang.
+5. **Dashboard tuyen dung cho Admin (da them):** tong cong ty, vi tri dang mo/tam dung/dong, tong ho so va dem theo trang thai. API Admin-only lay so dem truc tiep tu database; khong hien PII hay tao so lieu gia. SQL Server local integration da pass; thao tac UI thuc te van can manual test.
 6. SQL script, Swagger, test, README, prompt log trung thuc, demo video.
 
 Dashboard nay co gia tri de theo doi quy trinh tuyen dung trong app hien tai va co the dung de demo; no **khong phai** dashboard quan ly lao dong/bang cong day du.
@@ -46,10 +46,11 @@ Day la du lieu nhay cam va scope lon. Truoc khi code can chot phan quyen tung tr
 - Rubric yeu cau SQL script co du lieu mau; file vision noi khong dung fake/demo data. Chot huong an toan: script nop mon chi dung du lieu synthetic, khong thong tin ca nhan that; moi truong van hanh dung DB rieng va data duoc phe duyet. Neu nguoi dung/thay yeu cau khac, can xac nhan truoc khi sua script.
 - Google login trong vision chua duoc xay; MVP rubric dang dung dang ky/dang nhap JWT email/password. Khong tu them OAuth trong thoi gian MVP.
 - Dashboard MVP chi bao cao ve recruitment entities da co; chua hien thong tin CCCD, bank, timesheet, payroll hoac PII.
-- Deploy toan bo he thong online la yeu cau da xac nhan; chon hosting va chuyen database sau khi co thong tin tai khoan/chi phi va ket noi DB.
+- Deploy online cho buoi bao cao duoc uu tien: Vercel frontend + Node API host rieng + Supabase PostgreSQL. Day la nhanh demo tam thoi; khong con dung SQL Server o database online. Neu can nop dung stack SQL Server, can chuyen API sang SQL Server host online ve sau.
 
 ## Trang thai kiem chung dashboard MVP
 
 - API va giao dien da duoc them; metric `open`, `paused`, `closed`, `submitted`, `reviewing`, `accepted`, `rejected` dung cac gia tri status hien co trong model.
 - Dashboard chi hien cho Admin; backend cung bao ve endpoint bang JWT va role hien tai tu database.
-- Chua ket noi SQL Server de chay integration test hoac xac nhan so lieu tren du lieu that; can lam buoc nay truoc demo.
+- Da ket noi SQL Server Express local; API health, dang nhap Admin va dashboard API da tra so lieu tu DB sample.
+- CRUD qua browser, kiem tra quyen User/Guest va responsive UI van can manual test truoc demo.

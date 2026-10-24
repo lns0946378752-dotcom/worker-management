@@ -2,6 +2,13 @@
 
 Cap nhat: 2026-10-24 14:23 +07:00, may `SANG-ADMIN`, branch `main`; code changes cua dot hien tai chua duoc commit.
 
+## Kha nang chon database cho deploy demo
+
+- **Files chinh:** `backend/src/config/database.ts`, `backend/src/models/index.ts`, `database/supabase_schema.sql`.
+- **Hanh vi:** local mac dinh `mssql`; dat `DB_DIALECT=postgres` thi Sequelize dung PostgreSQL va SSL tuy chon. Mo hinh chung duoc giu; `minimumAge`/`maximumAge` dung SMALLINT de tuong thich ca hai DBMS.
+- **Data:** schema Supabase co sample synthetic rows; bat RLS va khong tao policy public. Backend phai ket noi bang server-side DB credential.
+- **Limit:** chua test voi project Supabase that; thay doi DBMS la compromise tam thoi so voi yeu cau SQL Server.
+
 ## Authentication va authorization
 
 - **Files chinh:** `backend/src/services/auth-service.ts`, `backend/src/utils/access-token.ts`, `backend/src/middleware/auth.ts`, `backend/src/routes/auth-routes.ts`, `frontend/src/api.ts`, `frontend/src/App.tsx`.
@@ -37,4 +44,5 @@ Cap nhat: 2026-10-24 14:23 +07:00, may `SANG-ADMIN`, branch `main`; code changes
 - **Files chinh:** `backend/src/routes/dashboard-routes.ts`, `backend/src/controllers/dashboard-controller.ts`, `backend/src/services/dashboard-service.ts`, `frontend/src/api.ts`, `frontend/src/App.tsx`, `frontend/src/styles.css`.
 - **Hanh vi:** Admin xem tong so cong ty, vacancy va application; vacancy duoc dem theo `open`/`paused`/`closed`, application theo `submitted`/`reviewing`/`accepted`/`rejected`; co nut lam moi.
 - **Quyen va du lieu:** `GET /api/dashboard` bat buoc JWT va role `admin`; backend truy van count tu Sequelize/SQL Server, khong tinh tu danh sach phan trang, khong tra thong tin ca nhan.
-- **Can kiem tra tay:** Admin xem so lieu; user/guest bi tu choi endpoint; doi status/tao ho so roi bam lam moi; giao dien responsive. Chua xac nhan voi SQL Server that.
+- **Da kiem tra:** SQL Server Express local, Admin login va dashboard endpoint thanh cong; database mau tra 2 cong ty, 2 vacancy, 1 application.
+- **Can kiem tra tay:** user/guest bi tu choi endpoint; doi status/tao ho so roi bam lam moi; CRUD tren browser va responsive layout.
