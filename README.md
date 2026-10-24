@@ -1,36 +1,118 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Worker Management
 
-## Getting Started
+Đồ án backend quản lý tuyển dụng lao động. Repo được tổ chức thành API Express theo kiến trúc Layered và giao diện demo Vite + Axios, dùng SQL Server với Sequelize.
 
-First, run the development server:
+## Phạm vi bản đầu
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Tài khoản: đăng ký, đăng nhập bằng JWT; tài khoản đăng ký mặc định là `user`; quyền quản trị được cấp riêng bằng lệnh seed.
+- Công ty: tạo, xem, sửa, xóa; tìm kiếm, lọc khu vực, sắp xếp và phân trang.
+- Vị trí tuyển dụng: gắn với công ty; tạo, xem, sửa, xóa; lọc khu vực/bộ phận/trạng thái và phân trang.
+- Hồ sơ ứng tuyển: ứng viên xem tin tuyển dụng và gửi hồ sơ; quản trị viên xem danh sách và cập nhật trạng thái.
+- Swagger UI, validation, giới hạn request đăng nhập, unit test và script SQL có dữ liệu mẫu.
+
+Quan hệ nghiệp vụ chính: `Company 1-n Vacancy`, `Vacancy 1-n Application`. Chấm công, tính lương, bán áo, Google login, phân quyền nhiều vai trò và lịch sử nhân sự nằm ngoài MVP hiện tại.
+
+## Công nghệ
+
+- Node.js, TypeScript, Express.js
+- SQL Server, Sequelize ORM (dialect MSSQL)
+- React, Vite, Axios
+- JWT, bcrypt, Zod, Swagger UI
+
+## Cấu trúc
+
+```text
+backend/
+  src/
+    config/       # cấu hình môi trường và kết nối
+    controllers/  # request/response HTTP
+    middleware/   # xác thực, phân quyền, validation, lỗi
+    models/       # Sequelize models và quan hệ
+    routes/       # REST endpoints và Swagger annotations
+    services/     # nghiệp vụ và truy vấn
+frontend/
+  src/            # giao diện React gọi API qua Axios
+database/
+  worker_management.sql
+docs/
+  PROMPT-LOG.md
+  PROJECT_VIVA_GUIDE.md
+legacy-next/      # bản Next.js cũ được lưu lại để tham khảo, không thuộc app chạy chính
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Chạy lần đầu trên Windows
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Yêu cầu: Node.js LTS, npm, SQL Server và SSMS/Azure Data Studio.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Tạo database và bảng: mở `database/worker_management.sql` trong SSMS, chọn chạy toàn bộ script.
+2. Tạo file cấu hình cục bộ bằng PowerShell:
 
-## Learn More
+   ```powershell
+   Copy-Item .env.example .env
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+3. Sửa `.env`: đặt thông tin SQL Server đúng máy của bạn và thay `JWT_SECRET` bằng chuỗi ngẫu nhiên dài ít nhất 32 ký tự. Không commit `.env`.
+4. Cài dependencies tại thư mục repo:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+   ```powershell
+   npm install
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+5. Tạo tài khoản Admin. Trước khi chạy, đặt `ADMIN_NAME`, `ADMIN_EMAIL` và `ADMIN_PASSWORD` trong `.env`; mật khẩu seed phải có ít nhất 12 ký tự:
 
-## Deploy on Vercel
+   ```powershell
+   npm run seed:admin
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+6. Khởi chạy API và giao diện:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+   ```powershell
+   npm run dev
+   ```
+
+   - Web: `http://localhost:5173`
+   - API health: `http://localhost:4000/health`
+   - Swagger UI: `http://localhost:4000/api-docs`
+
+Nếu API không khởi động, kiểm tra SQL Server có chạy, database đã được tạo và các biến `DB_*` trỏ đúng instance. Ứng dụng báo lỗi thay vì chuyển sang dữ liệu giả.
+
+## API chính
+
+| Method | Path | Truy cập | Mục đích |
+| --- | --- | --- | --- |
+| POST | `/api/auth/register` | Công khai | Tạo tài khoản User |
+| POST | `/api/auth/login` | Công khai, giới hạn tốc độ | Đăng nhập, trả JWT |
+| GET | `/api/auth/me` | Bearer JWT | Lấy tài khoản hiện tại |
+| GET | `/api/companies` | Công khai | Tìm kiếm/lọc/sắp xếp/phân trang công ty |
+| POST/PUT/DELETE | `/api/companies` | Admin | Quản lý công ty |
+| GET | `/api/vacancies` | Công khai | Lọc/phân trang vị trí tuyển dụng |
+| POST/PUT/DELETE | `/api/vacancies` | Admin | Quản lý vị trí tuyển dụng |
+| POST | `/api/applications` | Công khai, giới hạn tốc độ | Gửi hồ sơ ứng tuyển |
+| GET | `/api/applications` | Admin | Xem danh sách hồ sơ |
+| PATCH | `/api/applications/:id/status` | Admin | Cập nhật trạng thái hồ sơ |
+
+Ví dụ phân trang/lọc:
+
+```text
+GET /api/vacancies?page=1&pageSize=10&search=lap+rap&district=Bien+Hoa&status=open&sort=createdAt:desc
+```
+
+Các trường sort được allowlist ở backend; page size tối đa 100.
+
+## Kiểm tra
+
+```powershell
+npm test
+npm run build
+npm run lint
+```
+
+Unit tests kiểm tra validation và quy tắc pagination/sorting. Kiểm thử tích hợp với SQL Server cần database local được cấu hình.
+
+## Tài liệu đồ án
+
+- [Nhật ký prompt](./docs/PROMPT-LOG.md)
+- [Hướng dẫn vấn đáp và demo](./docs/PROJECT_VIVA_GUIDE.md)
+- [Yêu cầu và rubric của giảng viên](./docs/YEU-CAU-DO-AN-CUOI-KHOA.md)
+
+Thông tin hồ sơ dùng trong dữ liệu mẫu là giả. Không đưa CCCD, tài khoản ngân hàng hay dữ liệu cá nhân thật vào database demo.

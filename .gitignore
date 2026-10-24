@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+**/node_modules/
 /.pnp
 .pnp.*
 .yarn/*
@@ -13,9 +14,14 @@
 # testing
 /coverage
 
-# next.js
+# generated output
 /.next/
 /out/
+/legacy-next/node_modules/
+/legacy-next/.next/
+/backend/dist/
+/frontend/dist/
+/frontend/.vite/
 
 # production
 /build
@@ -33,6 +39,7 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 !.env.example
+!/legacy-next/.env.example
 
 # vercel
 .vercel
