@@ -65,7 +65,8 @@ Nếu yêu cầu mới có thể làm vi phạm mục 2 hoặc 3, AI phải dừ
 - Không xóa hoặc đổi tên cột/bảng đang được sử dụng nếu chưa có kế hoạch tương thích và di trú dữ liệu.
 - Dữ liệu audit, phản ánh, tài khoản và hồ sơ phải giữ lịch sử cần thiết; không hard-delete nếu nghiệp vụ hoặc pháp lý không cho phép.
 - `MUST NOT` ghi password, token, secret hoặc dữ liệu nhạy cảm nguyên bản vào database log, seed data, fixture hoặc commit.
-- `MUST` Use store procedure for all action data in project (Sử dụng thủ tục lưu trữ (stored procedure) cho mọi thao tác dữ liệu trong dự án)
+- **Quyết định riêng của đồ án Worker Management:** dùng Sequelize ORM theo rubric cuối khóa để backend Express kết nối và thao tác với SQL Server. Không áp dụng yêu cầu stored procedure tổng quát ở các tài liệu tham khảo khác cho dự án này, trừ khi giảng viên cập nhật yêu cầu rõ ràng.
+- Sequelize là ORM kết nối/truy vấn database; nó không tự host hay đưa SQL Server lên Internet. Môi trường hiện tại chạy database trên laptop và backend trên máy code theo cấu hình mạng nội bộ.
 
 ## 5. Quy tắc security
 

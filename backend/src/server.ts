@@ -1,6 +1,6 @@
 import { sequelize } from "./models/index.js";
 import app from "./app.js";
-import { assertJwtConfiguration } from "./middleware/auth.js";
+import { assertJwtConfiguration } from "./utils/access-token.js";
 
 const port = Number(process.env.PORT ?? 4000);
 

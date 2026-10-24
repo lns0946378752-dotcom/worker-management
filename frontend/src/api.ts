@@ -55,6 +55,23 @@ export type Application = {
   };
 };
 
+export type RecruitmentDashboard = {
+  companies: number;
+  vacancies: {
+    total: number;
+    open: number;
+    paused: number;
+    closed: number;
+  };
+  applications: {
+    total: number;
+    submitted: number;
+    reviewing: number;
+    accepted: number;
+    rejected: number;
+  };
+};
+
 export type PageResult<T> = {
   items: T[];
   pagination: {

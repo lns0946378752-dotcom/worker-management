@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 
 import { User } from "../models/index.js";
 import { HttpError } from "../utils/http-error.js";
-import { signAccessToken } from "../middleware/auth.js";
+import { signAccessToken } from "../utils/access-token.js";
 
 type PublicUser = {
   id: string;

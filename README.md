@@ -8,6 +8,7 @@
 - Công ty: tạo, xem, sửa, xóa; tìm kiếm, lọc khu vực, sắp xếp và phân trang.
 - Vị trí tuyển dụng: gắn với công ty; tạo, xem, sửa, xóa; lọc khu vực/bộ phận/trạng thái và phân trang.
 - Hồ sơ ứng tuyển: ứng viên xem tin tuyển dụng và gửi hồ sơ; quản trị viên xem danh sách và cập nhật trạng thái.
+- Dashboard Admin: tổng hợp công ty, vị trí theo trạng thái và hồ sơ theo trạng thái từ API/database thật.
 - Swagger UI, validation, giới hạn request đăng nhập, unit test và script SQL có dữ liệu mẫu.
 
 Quan hệ nghiệp vụ chính: `Company 1-n Vacancy`, `Vacancy 1-n Application`. Chấm công, tính lương, bán áo, Google login, phân quyền nhiều vai trò và lịch sử nhân sự nằm ngoài MVP hiện tại.
@@ -90,6 +91,7 @@ Nếu API không khởi động, kiểm tra SQL Server có chạy, database đã
 | POST | `/api/applications` | Công khai, giới hạn tốc độ | Gửi hồ sơ ứng tuyển |
 | GET | `/api/applications` | Admin | Xem danh sách hồ sơ |
 | PATCH | `/api/applications/:id/status` | Admin | Cập nhật trạng thái hồ sơ |
+| GET | `/api/dashboard` | Admin | Xem thống kê tuyển dụng tổng hợp |
 
 Ví dụ phân trang/lọc:
 
@@ -114,5 +116,10 @@ Unit tests kiểm tra validation và quy tắc pagination/sorting. Kiểm thử 
 - [Nhật ký prompt](./docs/PROMPT-LOG.md)
 - [Hướng dẫn vấn đáp và demo](./docs/PROJECT_VIVA_GUIDE.md)
 - [Yêu cầu và rubric của giảng viên](./docs/YEU-CAU-DO-AN-CUOI-KHOA.md)
+- [Theo dõi điểm ảnh hưởng toàn hệ thống và từng chức năng](./PROJECT-TRACKING/README.md)
+- [Lộ trình MVP và dashboard](./PROJECT-TRACKING/ROADMAP.md)
+- [Hướng dẫn kết nối backend tới SQL Server trên laptop](./SKILL/SQL-Server-Remote-Setup.md)
+- [Hướng dẫn JWT](./SKILL/JWT-Authentication-Flow.md) và [luồng CRUD Admin](./SKILL/Admin-CRUD-Flow.md)
+- [Hướng dẫn dashboard tuyển dụng Admin](./SKILL/Recruitment-Dashboard.md)
 
 Thông tin hồ sơ dùng trong dữ liệu mẫu là giả. Không đưa CCCD, tài khoản ngân hàng hay dữ liệu cá nhân thật vào database demo.

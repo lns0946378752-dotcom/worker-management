@@ -8,10 +8,11 @@ import {
   type Application,
   type Company,
   type PageResult,
+  type RecruitmentDashboard,
   type Vacancy,
 } from "./api";
 
-type View = "vacancies" | "companies" | "applications";
+type View = "dashboard" | "vacancies" | "companies" | "applications";
 
 const emptyCompany = {
   name: "",
@@ -56,13 +57,17 @@ function App() {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [vacancies, setVacancies] = useState<Vacancy[]>([]);
   const [applications, setApplications] = useState<Application[]>([]);
+  const [dashboard, setDashboard] = useState<RecruitmentDashboard | null>(null);
+  const [dashboardLoading, setDashboardLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [search, setSearch] = useState("");
   const [district, setDistrict] = useState("");
   const [status, setStatus] = useState("");
   const [companyForm, setCompanyForm] = useState(emptyCompany);
+  const [editingCompanyId, setEditingCompanyId] = useState<string | null>(null);
   const [vacancyForm, setVacancyForm] = useState(emptyVacancy);
+  const [editingVacancyId, setEditingVacancyId] = useState<string | null>(null);
   const [applicationForm, setApplicationForm] = useState(emptyApplication);
   const [applyTo, setApplyTo] = useState<Vacancy | null>(null);
   const [busy, setBusy] = useState(false);
@@ -99,6 +104,16 @@ function App() {
     setTotalPages(response.data.pagination.totalPages);
   }
 
+  async function loadDashboard() {
+    setDashboardLoading(true);
+    try {
+      const response = await api.get<RecruitmentDashboard>("/dashboard");
+      setDashboard(response.data);
+    } finally {
+      setDashboardLoading(false);
+    }
+  }
+
   useEffect(() => {
     void loadCompanies().catch((loadError: unknown) => setError(getErrorMessage(loadError)));
   }, []);
@@ -113,6 +128,11 @@ function App() {
     void loadApplications().catch((loadError: unknown) => setError(getErrorMessage(loadError)));
   }, [view, page, account]);
 
+  useEffect(() => {
+    if (view !== "dashboard" || account?.role !== "admin") return;
+    void loadDashboard().catch((loadError: unknown) => setError(getErrorMessage(loadError)));
+  }, [view, account]);
+
   async function submitAuth(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setBusy(true);
@@ -122,6 +142,7 @@ function App() {
       const response = await api.post<{ user: Account; token: string }>(endpoint, authForm);
       setAccessToken(response.data.token);
       setAccount(response.data.user);
+      if (response.data.user.role === "admin") setView("dashboard");
       setNotice(`Xin chào ${response.data.user.fullName}.`);
       setAuthForm({ fullName: "", email: "", password: "" });
     } catch (authError) {
@@ -135,6 +156,7 @@ function App() {
     setAccessToken(null);
     setAccount(null);
     setApplications([]);
+    setDashboard(null);
     setNotice("Bạn đã đăng xuất.");
     setView("vacancies");
   }
@@ -144,10 +166,15 @@ function App() {
     setBusy(true);
     setError("");
     try {
-      await api.post("/companies", companyForm);
+      if (editingCompanyId) {
+        await api.put(`/companies/${editingCompanyId}`, companyForm);
+      } else {
+        await api.post("/companies", companyForm);
+      }
       setCompanyForm(emptyCompany);
+      setEditingCompanyId(null);
       await loadCompanies();
-      setNotice("Đã thêm công ty.");
+      setNotice(editingCompanyId ? "Đã cập nhật công ty." : "Đã thêm công ty.");
     } catch (submitError) {
       setError(getErrorMessage(submitError));
     } finally {
@@ -160,19 +187,101 @@ function App() {
     setBusy(true);
     setError("");
     try {
-      await api.post("/vacancies", {
+      const payload = {
         ...vacancyForm,
         quantity: Number(vacancyForm.quantity),
         baseSalary: Number(vacancyForm.baseSalary),
         overtimeSalary: vacancyForm.overtimeSalary ? Number(vacancyForm.overtimeSalary) : null,
         minimumAge: vacancyForm.minimumAge ? Number(vacancyForm.minimumAge) : null,
         maximumAge: vacancyForm.maximumAge ? Number(vacancyForm.maximumAge) : null,
-      });
+      };
+      if (editingVacancyId) {
+        await api.put(`/vacancies/${editingVacancyId}`, payload);
+      } else {
+        await api.post("/vacancies", payload);
+      }
       setVacancyForm(emptyVacancy);
+      setEditingVacancyId(null);
       await loadVacancies();
-      setNotice("Đã thêm vị trí tuyển dụng.");
+      setNotice(editingVacancyId ? "Đã cập nhật vị trí tuyển dụng." : "Đã thêm vị trí tuyển dụng.");
     } catch (submitError) {
       setError(getErrorMessage(submitError));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function editCompany(company: Company) {
+    setEditingCompanyId(company.id);
+    setCompanyForm({
+      name: company.name,
+      address: company.address ?? "",
+      district: company.district,
+      contactName: company.contactName ?? "",
+      contactPhone: company.contactPhone ?? "",
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  async function deleteCompany(company: Company) {
+    if (!window.confirm(`Xóa công ty "${company.name}"? Chỉ xóa được công ty chưa có vị trí tuyển dụng.`)) return;
+
+    setBusy(true);
+    setError("");
+    try {
+      await api.delete(`/companies/${company.id}`);
+      if (editingCompanyId === company.id) {
+        setEditingCompanyId(null);
+        setCompanyForm(emptyCompany);
+      }
+      await loadCompanies();
+      setNotice("Đã xóa công ty.");
+    } catch (deleteError) {
+      setError(getErrorMessage(deleteError));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function editVacancy(vacancy: Vacancy) {
+    setEditingVacancyId(vacancy.id);
+    setVacancyForm({
+      companyId: vacancy.companyId,
+      department: vacancy.department,
+      title: vacancy.title,
+      quantity: vacancy.quantity,
+      status: vacancy.status,
+      workHours: vacancy.workHours,
+      overtime: vacancy.overtime ?? "",
+      baseSalary: Number(vacancy.baseSalary),
+      overtimeSalary: vacancy.overtimeSalary == null ? "" : String(vacancy.overtimeSalary),
+      allowances: vacancy.allowances ?? "",
+      minimumAge: vacancy.minimumAge == null ? "" : String(vacancy.minimumAge),
+      maximumAge: vacancy.maximumAge == null ? "" : String(vacancy.maximumAge),
+      genderRequirement: vacancy.genderRequirement,
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  async function deleteVacancy(vacancy: Vacancy) {
+    if (!window.confirm(`Xóa vị trí "${vacancy.title}"? Không thể xóa vị trí đã có hồ sơ ứng tuyển.`)) return;
+
+    setBusy(true);
+    setError("");
+    try {
+      await api.delete(`/vacancies/${vacancy.id}`);
+      if (editingVacancyId === vacancy.id) {
+        setEditingVacancyId(null);
+        setVacancyForm(emptyVacancy);
+      }
+      if (vacancies.length === 1 && page > 1) {
+        setPage(page - 1);
+      } else {
+        await loadVacancies();
+      }
+      setNotice("Đã xóa vị trí tuyển dụng.");
+    } catch (deleteError) {
+      setError(getErrorMessage(deleteError));
     } finally {
       setBusy(false);
     }
@@ -286,6 +395,11 @@ function App() {
       </section>
 
       <nav className="tabs" aria-label="Điều hướng">
+        {canManage && (
+          <button className={view === "dashboard" ? "tab active" : "tab"} onClick={() => setView("dashboard")}>
+            Tổng quan
+          </button>
+        )}
         <button className={view === "vacancies" ? "tab active" : "tab"} onClick={() => { setPage(1); setView("vacancies"); }}>Việc làm</button>
         <button className={view === "companies" ? "tab active" : "tab"} onClick={() => setView("companies")}>Công ty</button>
         {canManage && (
@@ -301,6 +415,71 @@ function App() {
           {error || notice}
           <button aria-label="Đóng thông báo" onClick={() => { setError(""); setNotice(""); }}>×</button>
         </div>
+      )}
+
+      {view === "dashboard" && canManage && (
+        <section className="content">
+          <div className="section-heading">
+            <div>
+              <h2>Tổng quan tuyển dụng</h2>
+              <p>Số liệu tổng hợp trực tiếp từ hệ thống tuyển dụng.</p>
+            </div>
+            <button
+              className="button button-quiet"
+              disabled={dashboardLoading}
+              onClick={() => void loadDashboard().catch((loadError: unknown) => setError(getErrorMessage(loadError)))}
+            >
+              {dashboardLoading ? "Đang tải..." : "Làm mới"}
+            </button>
+          </div>
+          {dashboardLoading && !dashboard ? (
+            <div className="empty-state">Đang tải số liệu...</div>
+          ) : dashboard ? (
+            <>
+              <div className="dashboard-grid">
+                <article className="dashboard-card">
+                  <span>Tổng công ty</span>
+                  <strong>{dashboard.companies}</strong>
+                </article>
+                <article className="dashboard-card">
+                  <span>Tổng vị trí tuyển dụng</span>
+                  <strong>{dashboard.vacancies.total}</strong>
+                </article>
+                <article className="dashboard-card dashboard-card-highlight">
+                  <span>Đang tuyển</span>
+                  <strong>{dashboard.vacancies.open}</strong>
+                </article>
+                <article className="dashboard-card">
+                  <span>Tổng hồ sơ ứng tuyển</span>
+                  <strong>{dashboard.applications.total}</strong>
+                </article>
+              </div>
+              <div className="dashboard-grid dashboard-grid-secondary">
+                <article className="dashboard-card">
+                  <span>Hồ sơ mới</span>
+                  <strong>{dashboard.applications.submitted}</strong>
+                </article>
+                <article className="dashboard-card">
+                  <span>Đang xem xét</span>
+                  <strong>{dashboard.applications.reviewing}</strong>
+                </article>
+                <article className="dashboard-card">
+                  <span>Đã tiếp nhận</span>
+                  <strong>{dashboard.applications.accepted}</strong>
+                </article>
+                <article className="dashboard-card">
+                  <span>Đã từ chối</span>
+                  <strong>{dashboard.applications.rejected}</strong>
+                </article>
+              </div>
+              <p className="dashboard-note">
+                Vị trí tạm ngưng: {dashboard.vacancies.paused} · Đã đóng: {dashboard.vacancies.closed}
+              </p>
+            </>
+          ) : (
+            <div className="empty-state">Chưa có số liệu tổng quan.</div>
+          )}
+        </section>
       )}
 
       {view === "vacancies" && (
@@ -331,7 +510,7 @@ function App() {
           </div>
           {canManage && companies.length > 0 && (
             <form className="inline-form vacancy-form" onSubmit={submitVacancy}>
-              <h3>Thêm vị trí tuyển dụng</h3>
+              <h3>{editingVacancyId ? "Cập nhật vị trí tuyển dụng" : "Thêm vị trí tuyển dụng"}</h3>
               <select required aria-label="Công ty tuyển dụng" value={vacancyForm.companyId} onChange={(event) => setVacancyForm({ ...vacancyForm, companyId: event.target.value })}>
                 <option value="">Chọn công ty</option>
                 {companies.map((company) => <option key={company.id} value={company.id}>{company.name}</option>)}
@@ -339,8 +518,16 @@ function App() {
               <input required placeholder="Tên vị trí" value={vacancyForm.title} onChange={(event) => setVacancyForm({ ...vacancyForm, title: event.target.value })} />
               <input required placeholder="Bộ phận" value={vacancyForm.department} onChange={(event) => setVacancyForm({ ...vacancyForm, department: event.target.value })} />
               <input required placeholder="Thời gian làm việc" value={vacancyForm.workHours} onChange={(event) => setVacancyForm({ ...vacancyForm, workHours: event.target.value })} />
+              <select aria-label="Trạng thái tuyển dụng" value={vacancyForm.status} onChange={(event) => setVacancyForm({ ...vacancyForm, status: event.target.value as Vacancy["status"] })}>
+                <option value="open">Đang tuyển</option>
+                <option value="paused">Tạm ngưng</option>
+                <option value="closed">Đã đóng</option>
+              </select>
               <input required min="1" type="number" aria-label="Số lượng" value={vacancyForm.quantity} onChange={(event) => setVacancyForm({ ...vacancyForm, quantity: Number(event.target.value) })} />
               <input required min="0" type="number" aria-label="Lương cơ bản" placeholder="Lương cơ bản (đ)" value={vacancyForm.baseSalary || ""} onChange={(event) => setVacancyForm({ ...vacancyForm, baseSalary: Number(event.target.value) })} />
+              <input placeholder="Thông tin tăng ca" value={vacancyForm.overtime} onChange={(event) => setVacancyForm({ ...vacancyForm, overtime: event.target.value })} />
+              <input min="0" type="number" aria-label="Lương tăng ca" placeholder="Lương tăng ca (đ)" value={vacancyForm.overtimeSalary} onChange={(event) => setVacancyForm({ ...vacancyForm, overtimeSalary: event.target.value })} />
+              <input placeholder="Phụ cấp" value={vacancyForm.allowances} onChange={(event) => setVacancyForm({ ...vacancyForm, allowances: event.target.value })} />
               <input min="0" type="number" aria-label="Tuổi tối thiểu" placeholder="Tuổi từ" value={vacancyForm.minimumAge} onChange={(event) => setVacancyForm({ ...vacancyForm, minimumAge: event.target.value })} />
               <input min="0" type="number" aria-label="Tuổi tối đa" placeholder="Tuổi đến" value={vacancyForm.maximumAge} onChange={(event) => setVacancyForm({ ...vacancyForm, maximumAge: event.target.value })} />
               <select aria-label="Giới tính yêu cầu" value={vacancyForm.genderRequirement} onChange={(event) => setVacancyForm({ ...vacancyForm, genderRequirement: event.target.value as typeof vacancyForm.genderRequirement })}>
@@ -348,7 +535,18 @@ function App() {
                 <option value="male">Nam</option>
                 <option value="female">Nữ</option>
               </select>
-              <button className="button button-primary" disabled={busy}>Lưu vị trí</button>
+              <button className="button button-primary" disabled={busy}>
+                {editingVacancyId ? "Cập nhật vị trí" : "Lưu vị trí"}
+              </button>
+              {editingVacancyId && (
+                <button
+                  className="button button-quiet"
+                  type="button"
+                  onClick={() => { setEditingVacancyId(null); setVacancyForm(emptyVacancy); }}
+                >
+                  Hủy sửa
+                </button>
+              )}
             </form>
           )}
           {vacancies.length === 0 ? (
@@ -371,6 +569,12 @@ function App() {
                     {vacancy.genderRequirement !== "any" ? ` · ${vacancy.genderRequirement === "male" ? "Nam" : "Nữ"}` : ""}
                   </p>
                   {vacancy.status === "open" && <button className="button button-primary" onClick={() => setApplyTo(vacancy)}>Ứng tuyển</button>}
+                  {canManage && (
+                    <div className="admin-actions">
+                      <button className="button button-quiet" type="button" onClick={() => editVacancy(vacancy)}>Sửa</button>
+                      <button className="button button-danger" type="button" disabled={busy} onClick={() => void deleteVacancy(vacancy)}>Xóa</button>
+                    </div>
+                  )}
                 </article>
               ))}
             </div>
@@ -386,20 +590,41 @@ function App() {
           </div>
           {canManage && (
             <form className="inline-form" onSubmit={submitCompany}>
-              <h3>Thêm công ty</h3>
+              <h3>{editingCompanyId ? "Cập nhật công ty" : "Thêm công ty"}</h3>
               <input required placeholder="Tên công ty" value={companyForm.name} onChange={(event) => setCompanyForm({ ...companyForm, name: event.target.value })} />
               <input required placeholder="Khu vực / khu công nghiệp" value={companyForm.district} onChange={(event) => setCompanyForm({ ...companyForm, district: event.target.value })} />
               <input placeholder="Địa chỉ" value={companyForm.address} onChange={(event) => setCompanyForm({ ...companyForm, address: event.target.value })} />
               <input placeholder="Nhân sự liên hệ" value={companyForm.contactName} onChange={(event) => setCompanyForm({ ...companyForm, contactName: event.target.value })} />
               <input placeholder="Số điện thoại liên hệ" value={companyForm.contactPhone} onChange={(event) => setCompanyForm({ ...companyForm, contactPhone: event.target.value })} />
-              <button className="button button-primary" disabled={busy}>Lưu công ty</button>
+              <button className="button button-primary" disabled={busy}>
+                {editingCompanyId ? "Cập nhật công ty" : "Lưu công ty"}
+              </button>
+              {editingCompanyId && (
+                <button
+                  className="button button-quiet"
+                  type="button"
+                  onClick={() => { setEditingCompanyId(null); setCompanyForm(emptyCompany); }}
+                >
+                  Hủy sửa
+                </button>
+              )}
             </form>
           )}
           <div className="company-grid">
             {companies.map((company) => (
               <article className="company-card" key={company.id}>
                 <span className="company-monogram">{company.name.slice(0, 1).toUpperCase()}</span>
-                <div><h3>{company.name}</h3><p>{company.district}</p><p>{company.address || "Chưa cập nhật địa chỉ"}</p></div>
+                <div className="company-card-content">
+                  <h3>{company.name}</h3>
+                  <p>{company.district}</p>
+                  <p>{company.address || "Chưa cập nhật địa chỉ"}</p>
+                  {canManage && (
+                    <div className="admin-actions">
+                      <button className="button button-quiet" type="button" onClick={() => editCompany(company)}>Sửa</button>
+                      <button className="button button-danger" type="button" disabled={busy} onClick={() => void deleteCompany(company)}>Xóa</button>
+                    </div>
+                  )}
+                </div>
               </article>
             ))}
             {companies.length === 0 && <div className="empty-state">Chưa có công ty trong hệ thống.</div>}

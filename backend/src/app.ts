@@ -10,6 +10,7 @@ import { HttpError } from "./utils/http-error.js";
 import applicationRoutes from "./routes/application-routes.js";
 import authRoutes from "./routes/auth-routes.js";
 import companyRoutes from "./routes/company-routes.js";
+import dashboardRoutes from "./routes/dashboard-routes.js";
 import vacancyRoutes from "./routes/vacancy-routes.js";
 
 const app = express();
@@ -64,6 +65,7 @@ app.get("/health", (_request, response) => response.json({ status: "ok" }));
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/api/auth", authRoutes);
 app.use("/api/companies", companyRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/vacancies", vacancyRoutes);
 app.use("/api/applications", applicationRoutes);
 
