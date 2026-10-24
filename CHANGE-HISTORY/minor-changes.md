@@ -105,3 +105,14 @@ Ghi cac thay doi nho, sua loi cuc bo, dieu chinh tai lieu/cau hinh, va cac buoc 
 - **Kiem chung:** `git diff --check`; documentation-only phan nay.
 - **Han che:** Chua tao cloud resources hay kiem tra UI provider bang tai khoan nguoi dung.
 - **Trang thai Git luc ghi:** Dang o worktree, chua commit; du kien push sau khi verify.
+
+## 2026-10-24 - Lap bang tong hop chuc nang va ma nguon
+
+- **May cap nhat lich su:** `SANG-ADMIN`
+- **Thoi diem ghi nhan:** `2026-10-24 17:17 +07:00`
+- **Repository/branch/commit lien quan:** `lns0946378752-dotcom/worker-management`, `main`, `719a834`
+- **Prompt nguoi dung:** “mik cần 1 bảng tổng hợp những chức năng - code - ... đang có theo kiểu cái này nằm ở đâu có chức năng gì, chức năng này hoạt động như thế nào, bản ở trên bạn đang làm về gì”
+- **Noi dung:** Tao `PROJECT-TRACKING/SYSTEM-FUNCTION-MAP.md`, tra cuu tung nghiep vu, UI/API/route/controller/service/model, quyen, request/data flow, database dang chay, phan biet app hien tai va legacy-next, danh sach tinh nang chua co.
+- **Kiem chung:** Doi chieu bang voi README, routes, controllers va services hien tai; `git diff --check`.
+- **Han che:** Tai lieu mo ta code dang co; khong phai bao dam moi chuc nang da duoc user manual test.
+- **Trang thai:** Chua commit/push.

@@ -171,3 +171,16 @@ Nguoi dung dinh chinh thoi han thuc la 17:10 ngay 2026-10-24, khong phai moc 14:
 - Them Vercel SPA rewrite, swagger URL runtime, va `SKILL/Codebase-Explanation.md` giai thich structure/data flow/auth/database va cach lan theo feature.
 - Mo rong `SKILL/Online-Demo-Deployment.md`: password reset, anh Supabase trang Coming up, vi tri SQL Editor, cac buoc giao dien Vercel/Render.
 - Build, lint, 18 tests pass; browser smoke test `/admin`, sai dang nhap hien toast tieng Viet, root guest menu pass. Chua deploy online.
+
+## 2026-10-24 17:17 — Tao bang tong hop chuc nang/code
+
+### Prompt nguoi dung (nguyen van)
+
+> mik cần 1 bảng tổng hợp những chức năng - code - ... đang có theo kiểu cái này nằm ở đâu có chức năng gì, chức năng này hoạt động như thế nào, bản ở trên bạn đang làm về gì
+
+### Ket qua thuc te
+
+- Tao `PROJECT-TRACKING/SYSTEM-FUNCTION-MAP.md` voi bang mapping feature -> UI -> endpoint -> controller/service -> logic/quyen -> database.
+- Mo ta architecture/request flow, shared files, SQL Server local location, status deploy, legacy Next.js vs recruitment app hien tai, va nhung chuc nang chua co.
+- Link tu `PROJECT-TRACKING/README.md`.
+- Chua commit/push tai thoi diem ghi log.
