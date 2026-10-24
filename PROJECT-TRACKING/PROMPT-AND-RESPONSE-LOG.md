@@ -1,6 +1,20 @@
-# Prompt va phan hoi du an
+# Prompt và phản hồi dự án
 
 Nhat ky nay luu cac prompt va ket qua/quyet dinh thuc te tu cac phien tiep theo khi da bat dau theo doi. Cac muc cu trong `docs/PROMPT-LOG.md` la tom luoc duoc dien dat lai, khong phai ban ghi nguyen van cua prompt lich su; khong sua chung thanh "nguyen van".
+
+## 2026-10-24 — Chuẩn hóa dấu tiếng Việt cho tài liệu nộp
+
+### Yêu cầu người dùng
+
+> “ở các file bạn tạo tôi xem qua thì thấy chưa file nào có dấu, giờ bạn update thêm dấu và push lên git đi”
+
+### Kết quả và kiểm chứng
+
+- Rà soát bộ tài liệu trong `NOP-BAI/`; bổ sung dấu tiếng Việt cho phần văn xuôi mới trong nhật ký prompt và lịch sử thay đổi.
+- Giữ nguyên lệnh, tên thư mục, mã nguồn, tên bảng/cột và cú pháp SQL; không Việt hóa nội dung làm ảnh hưởng khả năng chạy.
+- Làm mới gói mã nguồn sau khi kiểm tra các tệp được đưa vào; xác nhận bản SQL sao chép khớp tệp gốc.
+- Chỉ cập nhật tài liệu và gói nộp; không sửa mã nguồn, cơ sở dữ liệu hoặc dữ liệu nghiệp vụ. Không đưa thư mục mẫu, PDF tham khảo hay `.env` vào Git.
+- Chạy `git diff --check` trước khi commit; xác nhận commit và push sau khi thao tác hoàn tất.
 
 ## 2026-10-24 — Rà soát đăng ký, đăng nhập và tài liệu dự án
 
@@ -19,6 +33,19 @@ Người dùng nhắc lại: “tiếng việt có dấu nha” và yêu cầu l
 - Lượt tích hợp đầu: 7/9 ca đạt; Admin login trả 401 vì password hash trong database local không khớp biến Admin đã cấu hình; rate-limit API trả thông báo tiếng Việt và assertion test ban đầu dùng sai câu chữ. Assertion đã được sửa. Không ghi hoặc in bí mật.
 - **Chưa kết luận auth hoàn tất:** đang chạy lệnh reset password có xác nhận cho đúng tài khoản Admin local và sau đó phải chạy lại integration test. Chưa xác nhận được thao tác đăng nhập Admin thành công hay kiểm thử UI trên trình duyệt; không tuyên bố đã test mọi chức năng khác của MVP.
 - Các kiểm tra này chỉ bao phủ auth và thông báo API liên quan; chưa phải kiểm thử đầy đủ CRUD công ty/vị trí, nộp hồ sơ, dashboard trên giao diện và toàn bộ app.
+
+## 2026-10-24 — Chốt việc còn lại và chuyển giao AI tiếp theo
+
+### Yêu cầu người dùng
+
+Người dùng cần danh sách phần chưa làm và một prompt tiếng Việt để AI tiếp theo tiếp tục sửa lỗi, giữ tracking/change-history cập nhật, kiểm tra thông tin Admin từ `.env`, làm responsive theo các ảnh 4–6, đưa đăng ký sang trang riêng, không tự tạo dữ liệu mẫu và hướng dẫn deploy Vercel/API/database.
+
+### Kết quả ghi nhận
+
+- Tạo `NOP-BAI/PROMPT-TIEP-TUC.md` với bối cảnh repo/commit, test đã chạy, lỗi Admin còn mở, các yêu cầu UI, chính sách dữ liệu, thứ tự làm và tiêu chí hoàn tất.
+- Chưa triển khai menu mobile/form đăng ký mới/deploy trong lượt này; đây là các đầu việc bàn giao.
+- Thư mục Google Drive chưa được tạo/chia sẻ bởi chủ tài khoản; video chưa quay.
+- Không đưa credential, ảnh read-only, hoặc tài liệu/SQL của dự án Studio trong `Mẫu từ người khác/` vào source package.
 
 ## 2026-10-24 — Chot uu tien hoan thien MVP
 

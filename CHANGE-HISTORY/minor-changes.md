@@ -1,23 +1,29 @@
-# Lich su thay doi nho
+# Lịch sử thay đổi nhỏ
 
-Ghi cac thay doi nho, sua loi cuc bo, dieu chinh tai lieu/cau hinh, va cac buoc kiem tra khong lam thay doi dang ke kien truc hoac pham vi san pham. Neu chi chay lenh kiem tra ma khong sua file theo doi trong Git, ghi ro la khong co thay doi ma nguon.
+Ghi các thay đổi nhỏ, sửa lỗi cục bộ, điều chỉnh tài liệu/cấu hình và các bước kiểm tra không làm thay đổi đáng kể kiến trúc hoặc phạm vi sản phẩm. Nếu chỉ chạy lệnh kiểm tra mà không sửa tệp theo dõi trong Git, ghi rõ là không có thay đổi mã nguồn.
 
-## 2026-10-24 - Kiem thu auth voi SQL Server va chuan hoa thong bao tieng Viet
+## 2026-10-24 - Chuẩn hóa dấu tiếng Việt cho bộ tài liệu nộp
 
-- **May cap nhat:** `SANG-ADMIN`; gio local `+07:00`.
-- **Pham vi:** Viet test tich hop API auth voi SQL Server local; bo sung kiem tra gioi han password bcrypt theo byte UTF-8; thong bao API xac thuc, phan quyen, validation, rate limit, 404 va loi server bang tieng Viet co dau; validate form auth tren giao dien; them tuy chon reset password Admin chi tac dong tai khoan da co role Admin.
-- **To chuc tai lieu:** Them `SKILL/README.md` de phan biet quy tac AI, huong dan app va tai lieu tham khao; sap xep lai `PROJECT-TRACKING/README.md`.
-- **Test da chay:** `npm test` dat 19/19; backend/frontend build va lint dat; 8 ca tich hop SQL Server dat (register/persist/hash, validation, password byte limit, duplicate email, User login, `/auth/me`, role User, rate limit).
-- **Gioi han tich hop:** Admin login/dashboard chua xac nhan duoc. Hash hien tai khong khop password trong env; lenh reset tu choi chay vi password cau hinh chi co 7 ky tu, thap hon chinh sach seed toi thieu 12. Khong co thay doi nao duoc ap dung len tai khoan Admin.
-- **Bao mat:** Khong ghi email, mat khau, hash, JWT secret hoac thong tin ket noi vao lich su. Khong sua tai khoan User hay du lieu nghiep vu.
+- **Máy cập nhật:** `SANG-ADMIN`; giờ địa phương `+07:00`.
+- **Phạm vi:** Rà soát và bổ sung dấu tiếng Việt cho các tài liệu trong `NOP-BAI/` và nhật ký nguồn `docs/PROMPT-LOG.md`; chuẩn hóa phần văn xuôi mới trong lịch sử thay đổi. Giữ nguyên tên lệnh, mã, định danh và nội dung SQL.
+- **Gói mã nguồn:** Làm mới `NOP-BAI/worker-management-source.zip` từ mã nguồn đã theo dõi trong Git; không đưa `.env`, `.git`, `node_modules`, thư mục mẫu hoặc tài liệu tham khảo vào gói.
+- **Kiểm chứng:** Bản SQL trong `NOP-BAI/` khớp `database/worker_management.sql`; kiểm tra danh sách tệp trong gói nén và chạy `git diff --check`.
+- **Giới hạn:** Chỉ cập nhật tài liệu/gói nộp; không thay đổi mã nguồn, cơ sở dữ liệu, tài khoản hay dữ liệu nghiệp vụ. Chưa đẩy các thay đổi tài liệu tại thời điểm ghi mục này.
 
-## 2026-10-24 - Chuan bi bo ho so nop qua Google Drive
+## 2026-10-24 - Chuẩn bị bộ hồ sơ nộp qua Google Drive
 
-- **May cap nhat:** `SANG-ADMIN`; gio local `+07:00`.
-- **Noi dung:** Them bao cao do an, checklist tai len Drive va kich ban video 3–5 phut trong `NOP-BAI/`; bo sung ly do su dung cho 13 muc prompt cua Worker Management.
-- **Goi source:** Tao `NOP-BAI/worker-management-source.zip` tu workspace hien tai, co source thay doi chua commit; loai `.env`, `.git`, `node_modules`, build output, thu muc mau nguoi khac va tai lieu tham khao PDF/JPG.
-- **Deliverables sao chep rieng:** `worker_management.sql` va `PROMPT-LOG.md` vao `NOP-BAI/`.
-- **Gioi han:** Chua tao/chia se Google Drive; chua co video demo; bao cao la Markdown va chi can xuat PDF neu LMS/giang vien yeu cau.
+- **Máy cập nhật:** `SANG-ADMIN`; giờ địa phương `+07:00`.
+- **Nội dung:** Thêm báo cáo đồ án, danh sách kiểm tra tải lên Drive và kịch bản video 3–5 phút trong `NOP-BAI/`; bổ sung lý do sử dụng cho 13 mục prompt của Worker Management.
+- **Gói mã nguồn:** Tạo `NOP-BAI/worker-management-source.zip` từ workspace hiện tại, có mã nguồn thay đổi chưa commit; loại `.env`, `.git`, `node_modules`, kết quả biên dịch, thư mục mẫu của người khác và tài liệu tham khảo PDF/JPG.
+- **Tài liệu sao chép riêng:** Thêm `worker_management.sql` và `PROMPT-LOG.md` vào `NOP-BAI/`.
+- **Giới hạn:** Chưa tạo/chia sẻ Google Drive; chưa có video demo; báo cáo là Markdown và chỉ cần xuất PDF nếu LMS/giảng viên yêu cầu.
+
+## 2026-10-24 - Tạo prompt bàn giao để tiếp tục sửa lỗi và triển khai
+
+- **Máy cập nhật:** `SANG-ADMIN`; giờ địa phương `+07:00`.
+- **Nội dung:** Thêm `NOP-BAI/PROMPT-TIEP-TUC.md` tổng hợp hiện trạng, lỗi xác thực/Admin còn mở, yêu cầu tương thích màn hình nhỏ theo ảnh, quy tắc không tự tạo dữ liệu, danh sách kiểm tra triển khai và các tệp theo dõi cần cập nhật.
+- **Phạm vi ảnh:** Giữ trang `/admin` (ảnh 4), bỏ liên kết Admin trên trang công khai (ảnh 5), bổ sung thanh điều hướng di động đóng/mở (ảnh 6), tạo biểu mẫu đăng ký riêng có thông tin cá nhân cơ bản.
+- **Giới hạn:** Prompt là tài liệu bàn giao; chưa thực hiện các yêu cầu giao diện/triển khai tiếp theo. Không thay đổi hay duyệt dữ liệu mẫu cũ.
 
 ## 2026-10-24 - Cai dependencies va kiem tra ban dong bo
 
