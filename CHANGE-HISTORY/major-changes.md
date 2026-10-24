@@ -72,3 +72,16 @@ Chi ghi cac thay doi lam thay doi dang ke kien truc, cong nghe, pham vi chuc nan
 - **Tai lieu:** Them `SKILL/Online-Demo-Deployment.md`, link README va cap nhat tracking.
 - **Kiem chung:** Build, 18 unit tests, lint dat; runtime dialect probe xac nhan PostgreSQL mode va mac dinh MSSQL. Chua tao project Supabase/host, chua ket noi/test schema Postgres that, chua deploy.
 - **Trade-off:** Ban demo PostgreSQL khac DBMS SQL Server trong rubric; can neu ro trong bao cao va quay lai SQL Server cho ban nop neu giang vien yeu cau.
+
+## 2026-10-24 - Them sidebar, dang nhap rieng Admin va toast tieng Viet
+
+- **May cap nhat lich su:** `SANG-ADMIN`
+- **Thoi diem ghi nhan:** `2026-10-24 17:14 +07:00`
+- **Repository/branch/commit lien quan:** `lns0946378752-dotcom/worker-management`, `main`, sau commit `4ba9674`
+- **Nguon/quyet dinh:** Nguoi dung chon duong dan `/admin` cho trang dang nhap Admin va yeu cau menu trai cho cac tac vu, thong bao loi dropdown bang tieng Viet.
+- **Noi dung:** Thay tab nav bang sidebar responsive; Guest/User thay menu viec lam/cong ty va dang nhap/dang ky; Admin co tong quan/ho so/CRUD. Them trang dang nhap rieng `/admin`, khong hien dang ky tai trang nay va chan User truy cap UI Admin; API van xac minh quyen phia server.
+- **Thong bao:** Axios API errors duoc hien thi tieng Viet trong toast tu dong dong; them mapping cho cac loi dang nhap/ung tuyen/quyen/FK/validation pho bien.
+- **Deploy:** Them `vercel.json` SPA rewrite de URL `/admin` direct-load duoc tren Vercel; Swagger link dung API base URL thay vi hardcode localhost.
+- **Tai lieu:** Them `SKILL/Codebase-Explanation.md` giai thich kien truc va data flow; mo rong deploy guide ve Supabase password reset, SQL Editor, Vercel/Render UI; cap nhat README va tracking.
+- **Kiem chung:** Build, 18 unit tests, lint va diff check dat. Browser test local `/admin` hien dung trang dang nhap; sai credential hien toast tieng Viet; root hien menu Guest. Chua deploy test Vercel/Render/Supabase.
+- **Trang thai Git luc ghi:** Dang o worktree, chua commit; se push sau khi verify. PDF cua giang vien van untracked va khong duoc commit.

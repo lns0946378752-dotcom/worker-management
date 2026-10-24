@@ -146,3 +146,28 @@ Nguoi dung dinh chinh thoi han thuc la 17:10 ngay 2026-10-24, khong phai moc 14:
 - Mo rong `SKILL/Online-Demo-Deployment.md` voi cac buoc tao Supabase DB, chay schema PostgreSQL, lay Session Pooler settings, tao Render API host, import monorepo len Vercel, cau hinh env/CORS, tao Admin demo va smoke test.
 - Da ghi ro trade-off SQL Server/Postgres, bao mat secrets, RLS, free-tier/cold-start va troubleshooting.
 - Khong co account hay cloud project nao duoc tao tu phien nay; chua thuc hien deploy. Cac buoc can user tu thao tac tren tai khoan va khong chia se secrets.
+
+## 2026-10-24 17:06 — Huong dan tai khoan/cloud va yeu cau giao dien
+
+### Prompt nguoi dung (nguyen van)
+
+> 1. tạo supabase, trước tôi có tạo nhưng quên mk rồi chỉ cách xem trong file hướng dẫn luôn
+> bước mở sql là chưa bít nằm đâu luôn
+> 2. tạo ủl giao diện trên vercal -> nghe qua chứ chưa 1 lần mở lên và xem nó như thế nào nên cx ko bt dùng,
+> 3. như số 2
+> 4 cũng chịu ko bt, toàn bộ code trong hệ thống phải có giải thích cho tôi, Ngoài ra chỉnh sửa lại các thông báo lỗi, báo lỗi kiểu thả xuống và bằng tiếng việt, cái gì toàn tiếng anh ko à
+> để 1 thanh menu bên trái cho các tác vụ kể cả admin và user, tạo 1 trang riêng có đuôi admin để khi admin vào chỉ cần mở đường dẫn có đuôi .admin là vào trang đăng nhập của admin
+
+### Dinh chinh va quyet dinh
+
+- Nguoi dung chon URL `/admin` (thay vi duoi `/.admin`) cho trang dang nhap rieng.
+- Mat khau database Supabase khong xem lai duoc; huong dan phai chi cach reset password, SQL Editor va UI Vercel/Render.
+
+### Ket qua thuc te
+
+- Sidebar responsive: navigation cong khai cho Guest/User, them dashboard/ho so cho Admin; menu login/register.
+- Trang dang nhap rieng `/admin`; tai khoan User bi chan o UI va endpoint van duoc backend authorize.
+- API errors pho bien duoc doi sang tieng Viet va hien toast dropdown tu dong tat.
+- Them Vercel SPA rewrite, swagger URL runtime, va `SKILL/Codebase-Explanation.md` giai thich structure/data flow/auth/database va cach lan theo feature.
+- Mo rong `SKILL/Online-Demo-Deployment.md`: password reset, anh Supabase trang Coming up, vi tri SQL Editor, cac buoc giao dien Vercel/Render.
+- Build, lint, 18 tests pass; browser smoke test `/admin`, sai dang nhap hien toast tieng Viet, root guest menu pass. Chua deploy online.

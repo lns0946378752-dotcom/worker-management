@@ -122,6 +122,7 @@ Unit tests kiểm tra validation và quy tắc pagination/sorting. Kiểm thử 
 - [Hướng dẫn JWT](./SKILL/JWT-Authentication-Flow.md) và [luồng CRUD Admin](./SKILL/Admin-CRUD-Flow.md)
 - [Hướng dẫn dashboard tuyển dụng Admin](./SKILL/Recruitment-Dashboard.md)
 - [Hướng dẫn deploy demo Vercel + API host + Supabase](./SKILL/Online-Demo-Deployment.md)
+- [Giải thích cấu trúc và luồng code cho người mới](./SKILL/Codebase-Explanation.md)
 
 The optional PostgreSQL mode is a deployment workaround for the demo, not a replacement for the instructor's SQL Server requirement. Keep local `.env` on `DB_DIALECT=mssql` unless explicitly testing the hosted PostgreSQL environment.
 

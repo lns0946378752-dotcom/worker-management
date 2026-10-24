@@ -50,6 +50,7 @@ function formatSalary(value: number | string) {
 }
 
 function App() {
+  const [adminRoute, setAdminRoute] = useState(() => window.location.pathname === "/admin");
   const [account, setAccount] = useState<Account | null>(null);
   const [view, setView] = useState<View>("vacancies");
   const [authMode, setAuthMode] = useState<"login" | "register">("login");
@@ -73,6 +74,21 @@ function App() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+
+  useEffect(() => {
+    const syncRoute = () => setAdminRoute(window.location.pathname === "/admin");
+    window.addEventListener("popstate", syncRoute);
+    return () => window.removeEventListener("popstate", syncRoute);
+  }, []);
+
+  useEffect(() => {
+    if (!error && !notice) return;
+    const timeout = window.setTimeout(() => {
+      setError("");
+      setNotice("");
+    }, 5000);
+    return () => window.clearTimeout(timeout);
+  }, [error, notice]);
 
   async function loadCompanies() {
     const response = await api.get<PageResult<Company>>("/companies", {
@@ -140,9 +156,18 @@ function App() {
     try {
       const endpoint = authMode === "login" ? "/auth/login" : "/auth/register";
       const response = await api.post<{ user: Account; token: string }>(endpoint, authForm);
+      if (adminRoute && response.data.user.role !== "admin") {
+        setAccessToken(null);
+        setError("Tài khoản này không có quyền quản trị viên.");
+        return;
+      }
       setAccessToken(response.data.token);
       setAccount(response.data.user);
       if (response.data.user.role === "admin") setView("dashboard");
+      if (adminRoute) {
+        window.history.replaceState({}, "", "/");
+        setAdminRoute(false);
+      }
       setNotice(`Xin chào ${response.data.user.fullName}.`);
       setAuthForm({ fullName: "", email: "", password: "" });
     } catch (authError) {
@@ -159,6 +184,10 @@ function App() {
     setDashboard(null);
     setNotice("Bạn đã đăng xuất.");
     setView("vacancies");
+    if (adminRoute) {
+      window.history.replaceState({}, "", "/");
+      setAdminRoute(false);
+    }
   }
 
   async function submitCompany(event: FormEvent<HTMLFormElement>) {
@@ -321,6 +350,33 @@ function App() {
 
   const canManage = account?.role === "admin";
 
+  if (adminRoute && !canManage) {
+    return (
+      <main className="admin-login-page">
+        <section className="admin-login-card">
+          <a className="brand" href="/">
+            <span className="brand-mark">WM</span>
+            <span><strong>Worker Management</strong><small>Khu vực quản trị</small></span>
+          </a>
+          <h1>Đăng nhập quản trị</h1>
+          <p>Trang dành riêng cho tài khoản Admin.</p>
+          <form className="admin-login-form" onSubmit={submitAuth}>
+            <label>Email<input aria-label="Email Admin" autoComplete="username" required type="email" placeholder="Email quản trị" value={authForm.email} onChange={(event) => setAuthForm({ ...authForm, email: event.target.value })} /></label>
+            <label>Mật khẩu<input aria-label="Mật khẩu Admin" autoComplete="current-password" required type="password" placeholder="Mật khẩu" value={authForm.password} onChange={(event) => setAuthForm({ ...authForm, password: event.target.value })} /></label>
+            <button className="button button-primary" disabled={busy}>{busy ? "Đang đăng nhập..." : "Đăng nhập Admin"}</button>
+          </form>
+          <a className="text-button admin-back-link" href="/">← Quay lại trang tuyển dụng</a>
+        </section>
+        {(error || notice) && (
+          <div className={error ? "toast toast-error" : "toast toast-success"} role="alert">
+            <span>{error || notice}</span>
+            <button aria-label="Đóng thông báo" onClick={() => { setError(""); setNotice(""); }}>×</button>
+          </div>
+        )}
+      </main>
+    );
+  }
+
   return (
     <main className="app-shell">
       <header className="topbar">
@@ -394,24 +450,58 @@ function App() {
         </div>
       </section>
 
-      <nav className="tabs" aria-label="Điều hướng">
+      <nav className="tabs sidebar" aria-label="Menu chính">
+        <p className="sidebar-label">MENU</p>
         {canManage && (
           <button className={view === "dashboard" ? "tab active" : "tab"} onClick={() => setView("dashboard")}>
-            Tổng quan
+            <span aria-hidden="true">▦</span> Tổng quan
           </button>
         )}
-        <button className={view === "vacancies" ? "tab active" : "tab"} onClick={() => { setPage(1); setView("vacancies"); }}>Việc làm</button>
-        <button className={view === "companies" ? "tab active" : "tab"} onClick={() => setView("companies")}>Công ty</button>
+        <button className={view === "vacancies" ? "tab active" : "tab"} onClick={() => { setPage(1); setView("vacancies"); }}>
+          <span aria-hidden="true">⌕</span> Việc làm
+        </button>
+        <button className={view === "companies" ? "tab active" : "tab"} onClick={() => setView("companies")}>
+          <span aria-hidden="true">▤</span> Công ty
+        </button>
         {canManage && (
           <button className={view === "applications" ? "tab active" : "tab"} onClick={() => { setPage(1); setView("applications"); }}>
-            Hồ sơ ứng tuyển
+            <span aria-hidden="true">▣</span> Hồ sơ ứng tuyển
           </button>
         )}
-        {canManage && <a className="swagger-link" href="http://localhost:4000/api-docs" target="_blank" rel="noreferrer">Swagger API ↗</a>}
+        {!account && (
+          <a className="tab sidebar-link" href="/admin"><span aria-hidden="true">▣</span> Đăng nhập Admin</a>
+        )}
+        {canManage && (
+          <a
+            className="tab sidebar-link"
+            href={(api.defaults.baseURL ?? "http://localhost:4000/api").replace(/\/api\/?$/, "/api-docs")}
+            target="_blank"
+            rel="noreferrer"
+          >
+            API tài liệu ↗
+          </a>
+        )}
+        <div className="sidebar-bottom">
+          {account ? (
+            <>
+              <span className="sidebar-account">{account.fullName}<small>{canManage ? "Quản trị viên" : "Người dùng"}</small></span>
+              <button className="tab" onClick={signOut}><span aria-hidden="true">↪</span> Đăng xuất</button>
+            </>
+          ) : (
+            <>
+              <button className="tab" onClick={() => { setAuthMode("login"); document.querySelector<HTMLInputElement>(".auth-form input[type=email]")?.focus(); }}>
+                <span aria-hidden="true">↪</span> Đăng nhập người dùng
+              </button>
+              <button className="tab" onClick={() => { setAuthMode("register"); document.querySelector<HTMLInputElement>(".auth-form input[aria-label='Họ và tên']")?.focus(); }}>
+                <span aria-hidden="true">＋</span> Tạo tài khoản
+              </button>
+            </>
+          )}
+        </div>
       </nav>
 
       {(error || notice) && (
-        <div className={error ? "message message-error" : "message message-success"} role="status">
+        <div className={error ? "toast toast-error" : "toast toast-success"} role={error ? "alert" : "status"}>
           {error || notice}
           <button aria-label="Đóng thông báo" onClick={() => { setError(""); setNotice(""); }}>×</button>
         </div>
@@ -680,7 +770,7 @@ function App() {
           </section>
         </div>
       )}
-      <footer>Worker Management · Đồ án cuối khóa · API dùng SQL Server và Sequelize</footer>
+      <footer>Worker Management · Đồ án cuối khóa · Backend sử dụng Sequelize ORM</footer>
     </main>
   );
 }

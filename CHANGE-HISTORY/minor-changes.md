@@ -95,3 +95,13 @@ Ghi cac thay doi nho, sua loi cuc bo, dieu chinh tai lieu/cau hinh, va cac buoc 
 - **Kiem chung:** Kiem tra noi dung huong dan va `git diff --check`; day la documentation-only change.
 - **Gioi han:** Chua tao account/project/provider va chua thuc hien deploy; user tu tao account, tu nhap secrets. Khong chon plan tinh phi.
 - **Trang thai Git:** Chua commit/push phien ban huong dan expanded nay.
+
+## 2026-10-24 - Mo rong huong dan Supabase/Vercel va giai thich code
+
+- **May cap nhat lich su:** `SANG-ADMIN`
+- **Thoi diem ghi nhan:** `2026-10-24 17:14 +07:00`
+- **Repository/branch/commit lien quan:** `lns0946378752-dotcom/worker-management`, `main`, sau commit `4ba9674`
+- **Noi dung:** Viet ro cach reset database password Supabase (khong the xem lai password cu), chuyen SQL Editor, chay schema va thao tac Import/Configure/Deploy tren Vercel/Render. Them `SKILL/Codebase-Explanation.md` va index README/PROJECT-TRACKING.
+- **Kiem chung:** `git diff --check`; documentation-only phan nay.
+- **Han che:** Chua tao cloud resources hay kiem tra UI provider bang tai khoan nguoi dung.
+- **Trang thai Git luc ghi:** Dang o worktree, chua commit; du kien push sau khi verify.

@@ -14,25 +14,41 @@ Vercel chi host frontend trong setup nay; Express API can Node host rieng. Supab
 
 Can co tai khoan GitHub (repo `lns0946378752-dotcom/worker-management`), Vercel, Supabase va Render. Dang nhap cac dich vu bang tai khoan cua ban. Dung goi Free neu hien co va phu hop; khong nhap the, khong kich hoat paid plan/trial tinh phi neu chua dong y.
 
-Code deploy da duoc push tai commit `df4bfbc` tren nhanh `main`. Neu Vercel/Render khong thay commit, vao GitHub kiem tra nhanh `main` co commit do.
+Ma deploy da duoc push tren nhanh `main`; huong dan nay theo cau truc repo hien tai. Neu Vercel/Render khong thay ma moi, vao GitHub kiem tra nhanh `main` va Import lai repository.
 
 Tuyet doi khong paste `.env`, database password, JWT secret, access token hay Supabase service-role key vao chat, GitHub, anh chup man hinh, hoac bien `VITE_*`. Chi nhap database credential vao phan Environment Variables cua backend host.
 
 ## 1. Tao database PostgreSQL tren Supabase
 
-1. Dang nhap Supabase, chon **New project**.
-2. Chon organization, dat ten project (vi du `worker-management-demo`) va password database manh. Luu password vao password manager rieng; khong dung lai password email/GitHub.
-3. Chon region gan ban nhat neu co. Cho den khi project bao san sang.
-4. Mo **SQL Editor** → **New query**.
-5. Tren GitHub, mo `database/supabase_schema.sql` trong commit `df4bfbc`, copy toan bo noi dung vao SQL Editor va bam **Run** mot lan.
-6. Mo **Table Editor** va xac nhan co cac bang `users`, `companies`, `vacancies`, `applications`. Du lieu cong ty/vacancy/application mau la synthetic; khong nhap ho so nguoi that.
-7. Vao **Project Settings** → **Database** → **Connect**. Lay thong tin **Session pooler** neu duoc cung cap (de tranh mot so host khong truy cap duoc direct endpoint qua IPv4). Ghi tam cac truong host, port, database, username vao noi an toan. Khong chup/man hinh chia se phan password.
+### Neu da co project nhung quen password
+
+- Database password cu khong the xem lai thanh plaintext trong Supabase. Can **reset database password**, sau do cap nhat `DB_PASSWORD` tren Render neu API da deploy.
+- Dang nhap Supabase, mo project → **Project Settings** (bieu tuong banh rang) → **Database** → tim phan **Reset database password** / **Database password** → dat password moi va luu vao password manager.
+- Reset chi doi credential ket noi database, khong xoa bang/row. Tuy nhien, moi service dang dung password cu se mat ket noi cho den khi cap nhat secret moi.
+- Neu khong con quyen vao Supabase account/org, dung flow **Forgot password** tai trang dang nhap Supabase. Neu mat quyen chu so huu project, password database khong thay the duoc quyen account; lien he owner/admin cua organization.
+
+### Tao project / cho project san sang
+
+1. Dang nhap Supabase. Neu trang Project Overview hien **Coming up** nhu anh minh hoa, database dang khoi tao; cho den khi project status san sang truoc khi mo SQL Editor/lay ket noi.
+2. Neu tao moi, chon **New project**.
+3. Chon organization, dat ten project (vi du `worker-management-demo`) va password database manh. Luu password vao password manager rieng; khong dung lai password email/GitHub.
+4. Chon region gan ban nhat neu co. Cho den khi project bao san sang.
+
+### Tim SQL Editor va chay schema
+
+1. Khi da o trong project, nhin thanh icon dung ben trai.
+2. Chon muc **SQL Editor** (thuong co bieu tuong `>_`/terminal; hover icon de doc nhan, giao dien co the thay doi).
+3. Bam **New query** / **New snippet**.
+4. Mo file [`database/supabase_schema.sql`](../database/supabase_schema.sql) trong VS Code, copy noi dung va paste vao editor.
+5. Bam **Run** (thuong o goc duoi/phai cua editor). Doc ket qua; neu bao loi thi dung va gui screenshot da che thong tin nhay cam, khong bam Run lap lai lien tuc.
+6. Mo **Table Editor** tu thanh trai, xac nhan `users`, `companies`, `vacancies`, `applications`. Du lieu mau la synthetic.
+7. Vao **Project Settings** → **Database** → **Connect**. Lay **Session pooler** host/port/username/db name; password la password ban vua tao/reset.
 
 Khong chay `database/worker_management.sql` tren Supabase; file do la T-SQL cho SQL Server, khong phai PostgreSQL. Schema Supabase da bat Row Level Security va khong tao policy truy cap cong khai. Backend se ket noi database server-side, khong can Supabase anon/service-role key.
 
 ## 2. Deploy Express API tren Render
 
-1. Dang nhap Render bang GitHub, chon **New** → **Web Service**, ket noi repo nay, nhanh `main`.
+1. Dang nhap Render bang GitHub, o Dashboard chon **New +** → **Web Service**, ket noi repository `worker-management`, branch `main`.
 2. Cau hinh service:
 
    | Muc | Gia tri |
@@ -60,7 +76,7 @@ Khong chay `database/worker_management.sql` tren Supabase; file do la T-SQL cho 
 
    Khong can dat `PORT`; Render tu cap port. Tao JWT secret bang password manager/generator, khong dung database password. Khong them `ADMIN_PASSWORD` neu se tao Admin theo buoc 4.
 
-4. Chon **Create Web Service** va xem tab **Logs**. Build phai thanh cong va service phai bao live.
+4. Chon **Create Web Service** va xem trang service/tab **Logs**. Build phai thanh cong va service phai bao live.
 5. Copy domain public cua service, vi du `https://<ten-service>.onrender.com`. Mo `https://<ten-service>.onrender.com/health`; ket qua mong doi la `{"status":"ok"}`.
 
 Neu service khong khoi dong, mo Logs va doc loi. Loi xac thuc DB: doi chieu host/port/username/password va dam bao dung Session pooler. Khong in/paste gia tri secrets de gui debug.
@@ -89,6 +105,15 @@ Neu service khong khoi dong, mo Logs va doc loi. Loi xac thuc DB: doi chieu host
 6. Quay lai Render → **Environment**, sua `CLIENT_ORIGIN` thanh dung origin Vercel (chi domain, khong them `/` hay `/api`), luu thay doi va redeploy/restart API.
 
 Vercel URL la cong khai. Chi dung data mau. Neu thay doi `VITE_API_URL`, can redeploy frontend de Vite nhung gia tri moi vao ban build.
+
+Neu Vercel hien trang import:
+
+1. O **Import Git Repository**, chon `lns0946378752-dotcom/worker-management`. Neu khong thay repo, chon **Adjust GitHub App Permissions** va cap quyen cho dung repository; khong can doi repo thanh public.
+2. Trong **Configure Project**, dat **Project Name** tuy y, **Framework Preset = Vite**, **Root Directory = `./`** hoac `.` (repository root).
+3. Mo **Build and Output Settings** de nhap build command va output directory neu Vercel khong tu nhan.
+4. Mo **Environment Variables**, nhap `VITE_API_URL` va domain Render `/api`.
+5. Chon **Deploy**. Trang **Deployments** cho thay build logs; khi status **Ready**, bam **Visit** de mo URL.
+6. Moi lan thay env variable frontend, vao **Deployments** → **Redeploy** ban moi nhat de build lai.
 
 ## 4. Tao tai khoan Admin demo tren database online
 
