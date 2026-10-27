@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 
-import { getCurrentUser, loginUser, registerUser } from "../services/auth-service.js";
+import { loginUser, registerUser } from "../services/auth-service.js";
 
 export async function register(request: Request, response: Response) {
   const result = await registerUser(request.body);
@@ -13,6 +13,6 @@ export async function login(request: Request, response: Response) {
 }
 
 export async function currentUser(request: Request, response: Response) {
-  const user = await getCurrentUser(request.auth!.id);
-  response.json({ user });
+  const { id, fullName, email, role, status } = request.auth!;
+  response.json({ user: { id, fullName, email, role, status } });
 }

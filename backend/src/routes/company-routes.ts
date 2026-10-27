@@ -11,8 +11,9 @@ const router = Router();
  * @openapi
  * /companies:
  *   get:
- *     summary: Search and paginate companies
+ *     summary: Search and paginate companies (any approved account)
  *     tags: [Companies]
+ *     security: [{ bearerAuth: [] }]
  *     parameters:
  *       - { in: query, name: search, schema: { type: string } }
  *       - { in: query, name: district, schema: { type: string } }
@@ -21,7 +22,7 @@ const router = Router();
  *     responses:
  *       200: { description: A paginated company list }
  */
-router.get("/", validateQuery(listQuerySchema), list);
+router.get("/", authenticate, validateQuery(listQuerySchema), list);
 router.post("/", authenticate, requireRole("admin"), validateBody(companySchema), create);
 router.put("/:id", authenticate, requireRole("admin"), validateBody(companySchema), update);
 router.delete("/:id", authenticate, requireRole("admin"), remove);

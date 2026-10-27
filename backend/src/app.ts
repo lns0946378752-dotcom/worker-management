@@ -6,12 +6,14 @@ import swaggerUi from "swagger-ui-express";
 import { rateLimit } from "express-rate-limit";
 
 import { errorHandler } from "./middleware/error-handler.js";
+import { authenticate } from "./middleware/auth.js";
 import { HttpError } from "./utils/http-error.js";
-import applicationRoutes from "./routes/application-routes.js";
+import { adminService } from "./services/admin-service.js";
+import { workerService } from "./services/worker-service.js";
+import { createAdminRouter } from "./routes/admin-routes.js";
+import { createWorkerRouter } from "./routes/worker-routes.js";
 import authRoutes from "./routes/auth-routes.js";
 import companyRoutes from "./routes/company-routes.js";
-import dashboardRoutes from "./routes/dashboard-routes.js";
-import vacancyRoutes from "./routes/vacancy-routes.js";
 
 const app = express();
 const allowedOrigins = (process.env.CLIENT_ORIGIN ?? "http://localhost:5173")
@@ -50,7 +52,7 @@ const swaggerSpec = swaggerJsdoc({
     info: {
       title: "Worker Management API",
       version: "1.0.0",
-      description: "Recruitment and workforce-management API.",
+      description: "Workforce-management API: accounts, permissions and worker profiles.",
     },
     servers: [{ url: "/api" }],
     components: {
@@ -65,10 +67,9 @@ const swaggerSpec = swaggerJsdoc({
 app.get("/health", (_request, response) => response.json({ status: "ok" }));
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/api/auth", authRoutes);
+app.use("/api/admin", createAdminRouter({ authenticate, service: adminService }));
+app.use("/api/workers", createWorkerRouter({ authenticate, service: workerService }));
 app.use("/api/companies", companyRoutes);
-app.use("/api/dashboard", dashboardRoutes);
-app.use("/api/vacancies", vacancyRoutes);
-app.use("/api/applications", applicationRoutes);
 
 app.use((_request, response) => response.status(404).json({ message: "Không tìm thấy đường dẫn yêu cầu." }));
 app.use(errorHandler);

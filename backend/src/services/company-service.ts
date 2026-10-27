@@ -1,9 +1,10 @@
 import { Op } from "sequelize";
 
-import { Company, Vacancy } from "../models/index.js";
+import { Company } from "../models/index.js";
 import { HttpError } from "../utils/http-error.js";
 import { getOrder, getPagination, getPaginationResponse } from "../utils/pagination.js";
 import type { CompanyInput } from "../validators/schemas.js";
+import { select } from "./access-repository.js";
 
 export async function listCompanies(query: Record<string, unknown>) {
   const pagination = getPagination(query.page, query.pageSize);
@@ -63,8 +64,16 @@ export async function deleteCompany(id: string) {
     throw new HttpError(404, "Không tìm thấy công ty.");
   }
 
-  if (await Vacancy.count({ where: { companyId: id } })) {
-    throw new HttpError(409, "Hãy xóa hoặc chuyển các vị trí tuyển dụng trước khi xóa công ty.");
+  // Worker profiles (including soft-deleted ones) and legacy vacancy rows keep a foreign key to the company.
+  const [usage] = await select(
+    `DECLARE @n INT = 0;
+     IF OBJECT_ID(N'dbo.worker_profiles', N'U') IS NOT NULL SELECT @n = @n + COUNT(*) FROM dbo.worker_profiles WHERE company_id = :id;
+     IF OBJECT_ID(N'dbo.vacancies', N'U') IS NOT NULL SELECT @n = @n + COUNT(*) FROM dbo.vacancies WHERE company_id = :id;
+     SELECT @n AS total;`,
+    { id }
+  );
+  if (Number(usage?.total) > 0) {
+    throw new HttpError(409, "Không thể xóa công ty đang gắn với hồ sơ công nhân hoặc dữ liệu cũ.");
   }
 
   await company.destroy();

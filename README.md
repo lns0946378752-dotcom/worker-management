@@ -1,17 +1,17 @@
 # Worker Management
 
-Đồ án backend quản lý tuyển dụng lao động. Repo được tổ chức thành API Express theo kiến trúc Layered và giao diện demo Vite + Axios, dùng SQL Server với Sequelize.
+Đồ án backend quản lý công nhân. Repo được tổ chức thành API Express theo kiến trúc Layered và giao diện demo Vite + Axios, dùng SQL Server với Sequelize.
 
 ## Phạm vi bản đầu
 
 - Tài khoản: đăng ký, đăng nhập bằng JWT; tài khoản đăng ký mặc định là `user`; quyền quản trị được cấp riêng bằng lệnh seed.
 - Công ty: tạo, xem, sửa, xóa; tìm kiếm, lọc khu vực, sắp xếp và phân trang.
-- Vị trí tuyển dụng: gắn với công ty; tạo, xem, sửa, xóa; lọc khu vực/bộ phận/trạng thái và phân trang.
-- Hồ sơ ứng tuyển: ứng viên xem tin tuyển dụng và gửi hồ sơ; quản trị viên xem danh sách và cập nhật trạng thái.
-- Dashboard Admin: tổng hợp công ty, vị trí theo trạng thái và hồ sơ theo trạng thái từ API/database thật.
+- Tổng quan Admin: số công nhân, công nhân mới (30 ngày), tài khoản chờ duyệt/đang hoạt động và số công ty, lấy từ `GET /api/admin/overview`.
+- Quản lý tài khoản & phân quyền: duyệt/từ chối đăng ký, gán vai trò Sale/NVVP, cấp/thu hồi quyền xem danh sách công nhân cho NVVP.
+- Danh sách công nhân, công ty (gắn với hồ sơ công nhân) và nhật ký hoạt động dành cho Admin.
 - Swagger UI, validation, giới hạn request đăng nhập, unit test và script SQL có dữ liệu mẫu.
 
-Quan hệ nghiệp vụ chính: `Company 1-n Vacancy`, `Vacancy 1-n Application`. Chấm công, tính lương, bán áo, Google login, phân quyền nhiều vai trò và lịch sử nhân sự nằm ngoài MVP hiện tại.
+Quan hệ nghiệp vụ chính: `Company 1-n WorkerProfile`. Ba vai trò nghiệp vụ: Admin, Sale, NVVP. Tuyển dụng (vị trí, hồ sơ ứng tuyển) đã được loại khỏi ứng dụng; các bảng `vacancies`/`applications` cũ vẫn còn trong database, chưa có migration xóa.
 
 ## Công nghệ
 
@@ -84,19 +84,14 @@ Nếu API không khởi động, kiểm tra SQL Server có chạy, database đã
 | POST | `/api/auth/register` | Công khai | Tạo tài khoản User |
 | POST | `/api/auth/login` | Công khai, giới hạn tốc độ | Đăng nhập, trả JWT |
 | GET | `/api/auth/me` | Bearer JWT | Lấy tài khoản hiện tại |
-| GET | `/api/companies` | Công khai | Tìm kiếm/lọc/sắp xếp/phân trang công ty |
+| GET | `/api/companies` | Đã đăng nhập | Tìm kiếm/lọc/sắp xếp/phân trang công ty |
 | POST/PUT/DELETE | `/api/companies` | Admin | Quản lý công ty |
-| GET | `/api/vacancies` | Công khai | Lọc/phân trang vị trí tuyển dụng |
-| POST/PUT/DELETE | `/api/vacancies` | Admin | Quản lý vị trí tuyển dụng |
-| POST | `/api/applications` | Công khai, giới hạn tốc độ | Gửi hồ sơ ứng tuyển |
-| GET | `/api/applications` | Admin | Xem danh sách hồ sơ |
-| PATCH | `/api/applications/:id/status` | Admin | Cập nhật trạng thái hồ sơ |
-| GET | `/api/dashboard` | Admin | Xem thống kê tuyển dụng tổng hợp |
+| GET | `/api/admin/overview` | Admin | Số liệu tổng quan quản lý công nhân |
 
 Ví dụ phân trang/lọc:
 
 ```text
-GET /api/vacancies?page=1&pageSize=10&search=lap+rap&district=Bien+Hoa&status=open&sort=createdAt:desc
+GET /api/companies?page=1&pageSize=10&search=kj&district=Bien+Hoa&sort=name:asc
 ```
 
 Các trường sort được allowlist ở backend; page size tối đa 100.
@@ -121,14 +116,14 @@ Lệnh này tạo rồi xóa một tài khoản kiểm thử tổng hợp; khôn
 
 ## Tài liệu đồ án
 
-- [Nhật ký prompt](./docs/PROMPT-LOG.md)
-- [Hướng dẫn vấn đáp và demo](./docs/PROJECT_VIVA_GUIDE.md)
+- [Hướng dẫn dự án để bảo vệ đồ án (cách chạy, phân quyền, API, bảng "hỏi gì mở file nào")](./docs/PROJECT_GUIDE_FOR_DEFENSE.md)
+- [Nhật ký prompt](./docs/PROMPT-LOG.md) (13 nhóm prompt được tóm lược, không phải nguyên văn)
+- [Hướng dẫn vấn đáp và demo (bản cũ, xem cảnh báo đầu file)](./docs/PROJECT_VIVA_GUIDE.md)
 - [Yêu cầu và rubric của giảng viên](./docs/YEU-CAU-DO-AN-CUOI-KHOA.md)
 - [Theo dõi điểm ảnh hưởng toàn hệ thống và từng chức năng](./PROJECT-TRACKING/README.md)
 - [Lộ trình MVP và dashboard](./PROJECT-TRACKING/ROADMAP.md)
 - [Hướng dẫn kết nối backend tới SQL Server trên laptop](./SKILL/SQL-Server-Remote-Setup.md)
 - [Hướng dẫn JWT](./SKILL/JWT-Authentication-Flow.md) và [luồng CRUD Admin](./SKILL/Admin-CRUD-Flow.md)
-- [Hướng dẫn dashboard tuyển dụng Admin](./SKILL/Recruitment-Dashboard.md)
 - [Hướng dẫn deploy demo Vercel + API host + Supabase](./SKILL/Online-Demo-Deployment.md)
 - [Giải thích cấu trúc và luồng code cho người mới](./SKILL/Codebase-Explanation.md)
 

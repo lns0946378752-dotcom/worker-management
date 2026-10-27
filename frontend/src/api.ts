@@ -1,12 +1,14 @@
 import axios from "axios";
 
+import { writeToken, getTokenStorage } from "./session";
+
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL ?? "http://localhost:4000/api",
   headers: { "Content-Type": "application/json" },
   timeout: 10_000,
 });
 
-export type Role = "admin" | "user";
+export type Role = "admin" | "sale" | "nvvp" | "user";
 
 export type Account = {
   id: string;
@@ -24,52 +26,74 @@ export type Company = {
   contactPhone: string | null;
 };
 
-export type Vacancy = {
+export type AccountStatus = "pending" | "approved" | "rejected" | "disabled";
+
+export type AdminUser = {
   id: string;
-  companyId: string;
-  department: string;
-  title: string;
-  quantity: number;
-  status: "open" | "paused" | "closed";
-  workHours: string;
-  overtime: string | null;
-  baseSalary: number;
-  overtimeSalary: number | null;
-  allowances: string | null;
-  minimumAge: number | null;
-  maximumAge: number | null;
-  genderRequirement: "any" | "male" | "female";
-  company?: Pick<Company, "id" | "name" | "district">;
+  fullName: string;
+  email: string;
+  role: Role;
+  status: AccountStatus;
+  createdAt: string;
+  deletedAt: string | null;
+  hasWorkerListGrant: boolean;
 };
 
-export type Application = {
+export type AuditLogEntry = {
+  id: number;
+  actor_email: string | null;
+  action: string;
+  target_email: string | null;
+  company_id: string | null;
+  details: string | null;
+  created_at: string;
+};
+
+export type WorkerSummary = {
   id: string;
-  vacancyId: string;
-  applicantName: string;
+  fullName: string;
+  dateOfBirth: string | null;
+  phone: string | null;
+  gender: string | null;
+  centerName: string | null;
+  companyId: string | null;
+  companyName: string | null;
+  createdAt: string;
+};
+
+export type WorkerGender = "male" | "female" | "other";
+
+/** Payload of POST/PUT /workers; mirrors backend workerProfileSchema (17 profile fields incl. id on read). */
+export type WorkerProfileInput = {
+  fullName: string;
+  dateOfBirth: string;
   phone: string;
-  yearOfBirth: number;
-  gender: "male" | "female";
-  status: "submitted" | "reviewing" | "accepted" | "rejected";
-  vacancy?: Pick<Vacancy, "id" | "title" | "department"> & {
-    company?: Pick<Company, "id" | "name">;
-  };
+  gender: WorkerGender;
+  saleUserId?: string | null;
+  centerName?: string | null;
+  companyId?: string | null;
+  insuranceNumber?: string | null;
+  insuranceNote?: string | null;
+  nationalId?: string | null;
+  idIssueDate?: string | null;
+  idIssuePlace?: string | null;
+  permanentAddress?: string | null;
+  bankName?: string | null;
+  bankAccountNumber?: string | null;
+  note?: string | null;
 };
 
-export type RecruitmentDashboard = {
+export type WorkerProfile = WorkerProfileInput & {
+  id: string;
+  createdBy: string | null;
+  createdAt: string;
+  updatedAt: string | null;
+};
+
+export type AdminOverview = {
+  workers: { total: number; newLast30Days: number };
+  accounts: { pending: number; active: number };
   companies: number;
-  vacancies: {
-    total: number;
-    open: number;
-    paused: number;
-    closed: number;
-  };
-  applications: {
-    total: number;
-    submitted: number;
-    reviewing: number;
-    accepted: number;
-    rejected: number;
-  };
 };
 
 export type PageResult<T> = {
@@ -82,13 +106,26 @@ export type PageResult<T> = {
   };
 };
 
-export function setAccessToken(token: string | null) {
+export function setAccessToken(token: string | null): boolean {
+  const { storage, persistent } = getTokenStorage();
+  const saved = writeToken(storage, token) && (persistent || token === null);
   if (token) {
     api.defaults.headers.common.Authorization = `Bearer ${token}`;
-    return;
+    return saved;
   }
 
   delete api.defaults.headers.common.Authorization;
+  return saved;
+}
+
+/** Asks the server who this token belongs to; role and status are never taken from the browser. */
+export async function fetchCurrentAccount(token: string): Promise<Account> {
+  const response = await api.get<{ user: Account }>("/auth/me", { headers: { Authorization: "Bearer " + token } });
+  return response.data.user;
+}
+
+export function getErrorStatus(error: unknown): number | null {
+  return axios.isAxiosError(error) ? (error.response?.status ?? null) : null;
 }
 
 export function getErrorMessage(error: unknown) {
@@ -98,20 +135,12 @@ export function getErrorMessage(error: unknown) {
       const exactTranslations: Record<string, string> = {
         "Email or password is incorrect.": "Email hoặc mật khẩu chưa chính xác.",
         "An account with this email already exists.": "Email này đã được đăng ký.",
-        "Applicant does not meet the vacancy gender requirement.": "Giới tính của bạn chưa phù hợp với yêu cầu của vị trí này.",
-        "Applicant does not meet the vacancy age requirement.": "Độ tuổi của bạn chưa phù hợp với yêu cầu của vị trí này.",
-        "This vacancy is not accepting applications.": "Vị trí này hiện không nhận hồ sơ.",
-        "This phone number has already applied for the vacancy.": "Số điện thoại này đã ứng tuyển vị trí trên.",
         "A valid bearer token is required.": "Vui lòng đăng nhập để tiếp tục.",
         "The bearer token is invalid or expired.": "Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.",
         "The account for this token no longer exists.": "Tài khoản không còn tồn tại. Vui lòng đăng nhập lại.",
         "Sign-in is required.": "Vui lòng đăng nhập để tiếp tục.",
         "Your account does not have permission for this action.": "Tài khoản của bạn không có quyền thực hiện thao tác này.",
-        "A vacancy with applications cannot be deleted.": "Không thể xóa vị trí đã có hồ sơ ứng tuyển.",
-        "Remove or reassign this company's vacancies before deleting it.": "Hãy xóa hoặc chuyển các vị trí tuyển dụng trước khi xóa công ty.",
         "Company was not found.": "Không tìm thấy công ty.",
-        "Vacancy was not found.": "Không tìm thấy vị trí tuyển dụng.",
-        "Application was not found.": "Không tìm thấy hồ sơ ứng tuyển.",
         "Account was not found.": "Không tìm thấy tài khoản.",
         "The selected company does not exist.": "Công ty đã chọn không tồn tại.",
         "Request body is invalid.": "Thông tin gửi lên chưa hợp lệ. Vui lòng kiểm tra lại các trường.",
@@ -127,12 +156,6 @@ export function getErrorMessage(error: unknown) {
         "Sort field or direction is not supported.": "Trường hoặc chiều sắp xếp này chưa được hỗ trợ.",
       };
       if (exactTranslations[message]) return exactTranslations[message];
-      if (message.includes("does not meet the vacancy gender requirement")) {
-        return "Giới tính của bạn chưa phù hợp với yêu cầu của vị trí này.";
-      }
-      if (message.includes("does not meet the vacancy age requirement")) {
-        return "Độ tuổi của bạn chưa phù hợp với yêu cầu của vị trí này.";
-      }
       if (/[À-ỹ]/.test(message)) return message;
       return "Thao tác chưa thành công. Vui lòng kiểm tra thông tin và thử lại.";
     }

@@ -1,25 +1,25 @@
 import { z } from "zod";
 
-const trimmedText = (max: number) => z.string().trim().min(1, "Trường này không được để trống.").max(max);
+const trimmedText = (max: number) => z.string().trim().min(1, "TrÆ°á»ng nÃ y khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng.").max(max);
 const optionalText = (max: number) => z.string().trim().max(max).nullable().optional();
 
 export const registerSchema = z.object({
   fullName: trimmedText(120),
-  email: z.string().trim().email("Vui lòng nhập địa chỉ email hợp lệ.").max(254),
+  email: z.string().trim().email("Vui lÃ²ng nháº­p Ä‘á»‹a chá»‰ email há»£p lá»‡.").max(254),
   password: z
     .string()
-    .min(8, "Mật khẩu phải có ít nhất 8 ký tự.")
-    .max(72, "Mật khẩu không được vượt quá 72 byte.")
-    .refine((password) => Buffer.byteLength(password, "utf8") <= 72, "Mật khẩu không được vượt quá 72 byte."),
+    .min(8, "Máº­t kháº©u pháº£i cÃ³ Ã­t nháº¥t 8 kÃ½ tá»±.")
+    .max(72, "Máº­t kháº©u khÃ´ng Ä‘Æ°á»£c vÆ°á»£t quÃ¡ 72 byte.")
+    .refine((password) => Buffer.byteLength(password, "utf8") <= 72, "Máº­t kháº©u khÃ´ng Ä‘Æ°á»£c vÆ°á»£t quÃ¡ 72 byte."),
 });
 
 export const loginSchema = z.object({
-  email: z.string().trim().email("Vui lòng nhập địa chỉ email hợp lệ.").max(254),
+  email: z.string().trim().email("Vui lÃ²ng nháº­p Ä‘á»‹a chá»‰ email há»£p lá»‡.").max(254),
   password: z
     .string()
-    .min(1, "Vui lòng nhập mật khẩu.")
-    .max(72, "Mật khẩu không được vượt quá 72 byte.")
-    .refine((password) => Buffer.byteLength(password, "utf8") <= 72, "Mật khẩu không được vượt quá 72 byte."),
+    .min(1, "Vui lÃ²ng nháº­p máº­t kháº©u.")
+    .max(72, "Máº­t kháº©u khÃ´ng Ä‘Æ°á»£c vÆ°á»£t quÃ¡ 72 byte.")
+    .refine((password) => Buffer.byteLength(password, "utf8") <= 72, "Máº­t kháº©u khÃ´ng Ä‘Æ°á»£c vÆ°á»£t quÃ¡ 72 byte."),
 });
 
 export const companySchema = z.object({
@@ -31,44 +31,46 @@ export const companySchema = z.object({
 });
 export type CompanyInput = z.infer<typeof companySchema>;
 
-export const vacancySchema = z
-  .object({
-    companyId: z.string().uuid(),
-    department: trimmedText(120),
-    title: trimmedText(160),
-    quantity: z.coerce.number().int().positive().max(100_000),
-    status: z.enum(["open", "paused", "closed"]).default("open"),
-    workHours: trimmedText(160),
-    overtime: optionalText(240),
-    baseSalary: z.coerce.number().nonnegative().max(1_000_000_000),
-    overtimeSalary: z.coerce.number().nonnegative().max(1_000_000_000).nullable().optional(),
-    allowances: optionalText(500),
-    minimumAge: z.coerce.number().int().min(16).max(100).nullable().optional(),
-    maximumAge: z.coerce.number().int().min(16).max(100).nullable().optional(),
-    genderRequirement: z.enum(["any", "male", "female"]).default("any"),
-  })
-  .refine(
-    (vacancy) =>
-      vacancy.minimumAge === null ||
-      vacancy.minimumAge === undefined ||
-      vacancy.maximumAge === null ||
-      vacancy.maximumAge === undefined ||
-      vacancy.minimumAge <= vacancy.maximumAge,
-    { message: "Độ tuổi tối thiểu không được lớn hơn độ tuổi tối đa.", path: ["minimumAge"] }
-  );
-export type VacancyInput = z.infer<typeof vacancySchema>;
+const businessRole = z.enum(["admin", "sale", "nvvp"]);
 
-export const applicationSchema = z.object({
-  vacancyId: z.string().uuid(),
-  applicantName: trimmedText(120),
+export const adminStatusSchema = z.object({
+  status: z.enum(["approved", "rejected", "disabled"]),
+  role: businessRole.optional(),
+});
+
+export const adminRoleSchema = z.object({ role: businessRole });
+
+export const adminUserListQuerySchema = z.object({
+  status: z.enum(["pending", "approved", "rejected", "disabled"]).optional(),
+});
+
+export const uuidParam = z.guid();
+
+const isoDate = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/)
+  .refine((value) => !Number.isNaN(Date.parse(`${value}T00:00:00Z`)) && new Date(`${value}T00:00:00Z`).toISOString().startsWith(value));
+const digits = (min: number, max: number) => z.string().trim().regex(/^\d+$/).min(min).max(max);
+
+export const workerProfileSchema = z.object({
+  fullName: trimmedText(120),
+  dateOfBirth: isoDate.refine((value) => value >= "1900-01-01" && Number(value.slice(0, 4)) <= new Date().getFullYear() - 16),
   phone: z.string().trim().min(7).max(30),
-  yearOfBirth: z.coerce.number().int().min(1900).max(new Date().getFullYear() - 16),
-  gender: z.enum(["male", "female"]),
+  gender: z.enum(["male", "female", "other"]),
+  saleUserId: z.guid().nullable().optional(),
+  centerName: optionalText(160),
+  companyId: z.guid().nullable().optional(),
+  insuranceNumber: optionalText(30),
+  insuranceNote: optionalText(500),
+  nationalId: digits(9, 12).nullable().optional(),
+  idIssueDate: isoDate.nullable().optional(),
+  idIssuePlace: optionalText(160),
+  permanentAddress: optionalText(300),
+  bankName: optionalText(120),
+  bankAccountNumber: digits(6, 30).nullable().optional(),
+  note: optionalText(1000),
 });
-
-export const applicationStatusSchema = z.object({
-  status: z.enum(["submitted", "reviewing", "accepted", "rejected"]),
-});
+export type WorkerProfileInput = z.infer<typeof workerProfileSchema>;
 
 export const listQuerySchema = z.object({
   page: z.coerce.number().int().positive().default(1),
@@ -76,10 +78,7 @@ export const listQuerySchema = z.object({
   sort: z.string().trim().max(80).optional(),
   search: z.string().trim().max(120).optional(),
   district: z.string().trim().max(120).optional(),
-  companyId: z.string().uuid().optional(),
-  department: z.string().trim().max(120).optional(),
-  status: z.enum(["open", "paused", "closed"]).optional(),
-  applicationStatus: z.enum(["submitted", "reviewing", "accepted", "rejected"]).optional(),
+  companyId: z.guid().optional(),
 });
 
 export type ListQuery = z.infer<typeof listQuerySchema>;

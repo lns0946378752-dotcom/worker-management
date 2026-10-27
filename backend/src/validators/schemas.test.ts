@@ -2,12 +2,20 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
-  applicationSchema,
   companySchema,
   listQuerySchema,
   registerSchema,
-  vacancySchema,
+  uuidParam,
 } from "./schemas.js";
+
+test("identifiers accept SQL Server GUIDs (not RFC 4122 versions) and reject malformed values", () => {
+  for (const value of ["2f9d3a10-0b4e-f011-8c3d-00155d01aa01", "5C2E1F21-9A4B-F011-A8C4-0A0027000011", "11111111-1111-1111-1111-111111111111"]) {
+    assert.equal(uuidParam.safeParse(value).success, true, value);
+  }
+  for (const value of ["not-a-uuid", "", "a0000000-0000-4000-8000-00000000000g", "a0000000-0000-4000-8000-0000000000011"]) {
+    assert.equal(uuidParam.safeParse(value).success, false, value);
+  }
+});
 
 test("registration rejects a weak password", () => {
   const result = registerSchema.safeParse({
@@ -22,7 +30,7 @@ test("registration rejects a password exceeding bcrypt's UTF-8 byte limit", () =
   const result = registerSchema.safeParse({
     fullName: "Test User",
     email: "test@example.com",
-    password: "á".repeat(37),
+    password: "Ã¡".repeat(37),
   });
   assert.equal(result.success, false);
 });
@@ -35,31 +43,6 @@ test("registration normalizes surrounding whitespace", () => {
   });
   assert.equal(result.fullName, "Test User");
   assert.equal(result.email, "test@example.com");
-});
-
-test("vacancy rejects an age range where minimum exceeds maximum", () => {
-  const result = vacancySchema.safeParse({
-    companyId: "a9f3de45-ea0c-4f2b-86d4-0a7827fbd86f",
-    department: "Assembly",
-    title: "Operator",
-    quantity: 5,
-    workHours: "08:00–17:00",
-    baseSalary: 8_000_000,
-    minimumAge: 40,
-    maximumAge: 20,
-  });
-  assert.equal(result.success, false);
-});
-
-test("application rejects a birth year outside working-age validation", () => {
-  const result = applicationSchema.safeParse({
-    vacancyId: "a9f3de45-ea0c-4f2b-86d4-0a7827fbd86f",
-    applicantName: "Test User",
-    phone: "0900000000",
-    yearOfBirth: 2015,
-    gender: "male",
-  });
-  assert.equal(result.success, false);
 });
 
 test("list query applies defaults and rejects excessive page sizes", () => {

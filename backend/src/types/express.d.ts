@@ -1,13 +1,9 @@
-import type { UserRole } from "../models/index.js";
+import type { AccessState } from "../services/access-policy.js";
 
 declare global {
   namespace Express {
     interface Request {
-      auth?: {
-        id: string;
-        email: string;
-        role: UserRole;
-      };
+      auth?: AccessState;
       validatedQuery?: Record<string, unknown>;
     }
   }

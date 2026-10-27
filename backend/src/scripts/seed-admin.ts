@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 
 import { sequelize, User } from "../models/index.js";
+import { execute, select } from "../services/access-repository.js";
 
 const fullName = process.env.ADMIN_NAME;
 const email = process.env.ADMIN_EMAIL?.trim().toLowerCase();
@@ -39,6 +40,14 @@ try {
 
     if (!created) {
       throw new Error("Tài khoản theo ADMIN_EMAIL đã tồn tại; không thay đổi vai trò hay mật khẩu.");
+    }
+
+    // After migration 001 new accounts default to 'pending'; a freshly seeded Admin must be able to sign in.
+    const [{ total }] = await select(
+      "SELECT COUNT(*) AS total FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'users' AND COLUMN_NAME = 'status'"
+    );
+    if (Number(total) > 0) {
+      await execute("UPDATE dbo.users SET status = 'approved', status_changed_at = SYSUTCDATETIME() WHERE email = :email AND role = 'admin'", { email });
     }
 
     console.info("Đã tạo tài khoản Admin.");

@@ -8,10 +8,11 @@
   ],
   "scripts": {
     "dev": "concurrently -k -n API,WEB -c blue,green \"npm run dev --workspace @worker-management/api\" \"npm run dev --workspace @worker-management/web\"",
+    "dev:test": "concurrently -k -n API-TEST,WEB-TEST -c yellow,magenta \"npm run dev:test --workspace @worker-management/api\" \"npm run dev:test --workspace @worker-management/web\"",
     "build": "npm run build --workspace @worker-management/api && npm run build --workspace @worker-management/web",
     "lint": "npm run lint --workspace @worker-management/api && npm run lint --workspace @worker-management/web",
     "start": "npm run start --workspace @worker-management/api",
-    "test": "npm run test --workspace @worker-management/api",
+    "test": "npm run test --workspace @worker-management/api && npm run test --workspace @worker-management/web",
     "test:integration": "npm run test:integration --workspace @worker-management/api",
     "seed:admin": "npm run seed:admin --workspace @worker-management/api --"
   },

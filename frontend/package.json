@@ -5,8 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
+    "dev:test": "vite --mode test --port 5174 --strictPort",
     "build": "tsc -b && vite build",
     "typecheck": "tsc --noEmit",
+    "test": "tsx --test src/session.test.ts src/workerValidation.test.ts",
     "lint": "eslint src"
   },
   "dependencies": {

@@ -1,5 +1,8 @@
 # Hướng dẫn demo và vấn đáp
 
+> ⚠️ **Cảnh báo — tài liệu này đã lỗi thời.** Nội dung bên dưới mô tả mô hình **tuyển dụng** (Company–Vacancy–Application, ứng tuyển, đơn trùng) mà ứng dụng hiện tại **đã loại bỏ**. Ứng dụng hiện quản lý **tài khoản, phân quyền Admin/Sale/NVVP và hồ sơ công nhân**.
+> Khi bảo vệ, hãy dùng [PROJECT_GUIDE_FOR_DEFENSE.md](./PROJECT_GUIDE_FOR_DEFENSE.md). Các phần chung vẫn đúng: luồng React → Express → Controller → Service → Sequelize/SQL Server, bcrypt, JWT, Zod, giới hạn page size. Các phần về vị trí tuyển dụng, ứng tuyển và đơn trùng **không còn áp dụng**. Nội dung cũ được giữ nguyên để làm lịch sử.
+
 ## Kịch bản demo 3–5 phút
 
 1. **Giới thiệu đề tài (20–30 giây):** Worker Management hỗ trợ trung tâm xem thông tin công ty, vị trí đang tuyển và nhận hồ sơ ứng tuyển.
